@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Settings — Ledger CFO</title>
+  <meta name="description" content="Manage your Ledger CFO account settings, business profile, integrations, and billing."/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#0f2d6b;--navy-light:#1a3f8f;--navy-pale:#eaeffa;
+      --charcoal:#0d1117;--gray:#5a6a7e;--gray-light:#9aaabb;
+      --border:#dde3ee;--cream:#f6f8fc;--white:#fff;
+      --green:#1a6e4a;--green-pale:#e8f5ef;
+      --amber:#b8730a;--amber-pale:#fef3e2;
+      --red:#c0392b;--red-pale:#fdecea;
+      --shadow-sm:0 1px 4px rgba(13,17,23,0.06);
+      --shadow-md:0 4px 20px rgba(13,17,23,0.08);
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Epilogue',sans-serif;background:var(--cream);color:var(--charcoal);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+    /* TOPBAR */
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:var(--white);border-bottom:1px solid var(--border);flex-shrink:0;position:sticky;top:0;z-index:50}
+    .topbar-left{display:flex;align-items:center;gap:32px}
+    .nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+    .nav-logo-name{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:700;color:var(--charcoal);letter-spacing:-0.3px;line-height:1}
+    .nav-logo-tag{font-size:9px;font-weight:500;color:var(--navy);letter-spacing:3px;line-height:1}
+    .topbar-nav{display:flex;align-items:center;gap:4px}
+    .topbar-nav a{font-size:13px;font-weight:400;color:var(--gray);text-decoration:none;padding:6px 12px;border-radius:8px;transition:background 0.15s,color 0.15s;display:flex;align-items:center;gap:6px}
+    .topbar-nav a:hover{background:var(--cream);color:var(--charcoal)}
+    .topbar-nav a.active{background:var(--navy-pale);color:var(--navy);font-weight:500}
+    .topbar-right{display:flex;align-items:center;gap:12px}
+    .topbar-plan{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:var(--navy-pale);color:var(--navy);padding:4px 10px;border-radius:100px}
+    .topbar-avatar{width:32px;height:32px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:white;cursor:pointer;font-family:'Cormorant Garamond',serif}
+
+    /* LAYOUT */
+    .layout{display:flex;flex:1}
+
+    /* SIDEBAR NAV */
+    .settings-nav{width:220px;background:var(--white);border-right:1px solid var(--border);padding:24px 12px;flex-shrink:0}
+    .settings-nav-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gray-light);padding:0 12px;margin-bottom:8px}
+    .settings-nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--gray);font-weight:400;transition:all 0.15s;margin-bottom:2px;text-decoration:none}
+    .settings-nav-item:hover{background:var(--cream);color:var(--charcoal)}
+    .settings-nav-item.active{background:var(--navy-pale);color:var(--navy);font-weight:500}
+    .settings-nav-item i{font-size:16px}
+
+    /* MAIN */
+    .main{flex:1;padding:40px;overflow-y:auto;max-width:800px}
+
+    /* SECTION */
+    .settings-section{display:none}
+    .settings-section.active{display:block;animation:fadeUp 0.3s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .section-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--charcoal);letter-spacing:-0.3px;margin-bottom:4px}
+    .section-sub{font-size:14px;color:var(--gray);font-weight:300;margin-bottom:32px}
+
+    /* CARDS */
+    .settings-card{background:var(--white);border:1px solid var(--border);border-radius:14px;margin-bottom:16px;overflow:hidden}
+    .card-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .card-header-title{font-size:14px;font-weight:500;color:var(--charcoal)}
+    .card-header-sub{font-size:12px;color:var(--gray-light);font-weight:300;margin-top:2px}
+    .card-body{padding:20px 24px}
+    .card-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+    .card-row:last-child{border:none;padding-bottom:0}
+    .card-row:first-child{padding-top:0}
+    .card-row-label{font-size:14px;color:var(--charcoal);font-weight:400}
+    .card-row-sub{font-size:12px;color:var(--gray-light);font-weight:300;margin-top:2px}
+    .card-row-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+
+    /* FORM ELEMENTS */
+    .form-input{font-family:'Epilogue',sans-serif;font-size:14px;font-weight:300;padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--cream);color:var(--charcoal);transition:border-color 0.2s;min-width:200px}
+    .form-input:focus{border-color:var(--navy);background:var(--white)}
+    .form-select{font-family:'Epilogue',sans-serif;font-size:13px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--cream);color:var(--charcoal);cursor:pointer;min-width:160px}
+    .form-select:focus{border-color:var(--navy)}
+
+    /* TOGGLE */
+    .toggle{position:relative;width:40px;height:22px;flex-shrink:0}
+    .toggle input{opacity:0;width:0;height:0}
+    .toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:100px;cursor:pointer;transition:background 0.2s}
+    .toggle-slider::before{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:3px;left:3px;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.15)}
+    .toggle input:checked+.toggle-slider{background:var(--navy)}
+    .toggle input:checked+.toggle-slider::before{transform:translateX(18px)}
+
+    /* BUTTONS */
+    .btn-primary{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:500;padding:8px 18px;background:var(--navy);color:white;border:none;border-radius:8px;cursor:pointer;transition:background 0.2s;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+    .btn-primary:hover{background:var(--navy-light)}
+    .btn-outline{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:400;padding:8px 18px;background:transparent;color:var(--navy);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:background 0.2s;display:inline-flex;align-items:center;gap:6px}
+    .btn-outline:hover{background:var(--navy-pale)}
+    .btn-danger{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:400;padding:8px 18px;background:transparent;color:var(--red);border:1px solid rgba(192,57,43,0.2);border-radius:8px;cursor:pointer;transition:background 0.2s;display:inline-flex;align-items:center;gap:6px}
+    .btn-danger:hover{background:var(--red-pale)}
+
+    /* INTEGRATION CARDS */
+    .integration-item{display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--border)}
+    .integration-item:last-child{border:none;padding-bottom:0}
+    .integration-item:first-child{padding-top:0}
+    .integration-logo{width:40px;height:40px;border-radius:10px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--cream)}
+    .integration-info{flex:1}
+    .integration-name{font-size:14px;font-weight:500;color:var(--charcoal);margin-bottom:2px}
+    .integration-desc{font-size:12px;color:var(--gray-light);font-weight:300}
+    .integration-status{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500}
+    .integration-status.connected{color:var(--green)}
+    .integration-status.disconnected{color:var(--gray-light)}
+    .status-dot{width:6px;height:6px;border-radius:50%}
+    .status-dot.on{background:var(--green)}
+    .status-dot.off{background:var(--gray-light)}
+
+    /* PLAN CARD */
+    .plan-current{background:var(--navy);border-radius:12px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+    .plan-current-info h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:white;margin-bottom:2px}
+    .plan-current-info p{font-size:13px;color:rgba(255,255,255,0.6);font-weight:300}
+    .plan-upgrade-btn{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:600;padding:9px 20px;background:white;color:var(--navy);border:none;border-radius:8px;cursor:pointer;white-space:nowrap}
+    .plan-upgrade-btn:hover{opacity:0.9}
+
+    /* DATA RETENTION */
+    .retention-options{display:flex;flex-direction:column;gap:10px}
+    .retention-option{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color 0.2s}
+    .retention-option.selected{border-color:var(--navy);background:var(--navy-pale)}
+    .retention-option input{margin-top:2px;accent-color:var(--navy);flex-shrink:0}
+    .retention-option-text h4{font-size:14px;font-weight:500;color:var(--charcoal);margin-bottom:2px}
+    .retention-option-text p{font-size:12px;color:var(--gray);font-weight:300;line-height:1.5}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--charcoal);color:white;font-size:13px;padding:10px 20px;border-radius:8px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:200;white-space:nowrap;display:flex;align-items:center;gap:8px}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    @media(max-width:700px){
+      .topbar{padding:0 16px;height:56px}
+      .topbar-nav a span{display:none}
+      .topbar-nav a{padding:6px 8px}
+      .layout{flex-direction:column}
+      .settings-nav{width:100%;border-right:none;border-bottom:1px solid var(--border);padding:8px 12px;display:flex;flex-wrap:wrap;gap:4px;flex-direction:row}
+      .settings-nav-label{display:none}
+      .settings-nav-item{padding:7px 12px;font-size:12px;margin-bottom:0}
+      .main{padding:20px 16px;max-width:100%}
+      .form-input{min-width:0;width:100%}
+      .form-select{min-width:0;width:100%}
+      .card-row{flex-direction:column;align-items:flex-start;gap:8px}
+      .card-row-right{width:100%}
+      .plan-current{flex-direction:column;gap:12px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a class="nav-logo" href="index.html">
+      <svg width="28" height="28" viewBox="0 0 52 52" fill="none">
+        <rect width="52" height="52" rx="11" fill="#0f2d6b"/>
+        <rect x="10" y="30" width="8" height="14" rx="2" fill="white" opacity="0.45"/>
+        <rect x="22" y="20" width="8" height="24" rx="2" fill="white" opacity="0.7"/>
+        <rect x="34" y="12" width="8" height="32" rx="2" fill="white"/>
+        <polyline points="10,26 26,16 44,8" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+        <circle cx="10" cy="26" r="2.2" fill="white" opacity="0.85"/>
+        <circle cx="44" cy="8" r="2.2" fill="white" opacity="0.85"/>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:1px">
+        <span class="nav-logo-name">Ledger</span>
+        <span class="nav-logo-tag">CFO</span>
+      </div>
+    </a>
+    <nav class="topbar-nav">
+      <a href="dashboard.html"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> <span>Dashboard</span></a>
+      <a href="chat.html"><i class="ti ti-message" aria-hidden="true"></i> <span>Ask CFO</span></a>
+      <a href="reports.html"><i class="ti ti-file-analytics" aria-hidden="true"></i> <span>Reports</span></a>
+      <a href="settings.html" class="active"><i class="ti ti-settings" aria-hidden="true"></i> <span>Settings</span></a>
+    </nav>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-plan" id="planBadge">Pro</span>
+    <div class="topbar-avatar" id="avatarEl">R</div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SETTINGS SIDEBAR -->
+  <div class="settings-nav">
+    <div class="settings-nav-label" style="margin-bottom:12px">Settings</div>
+    <a class="settings-nav-item active" onclick="showSection('profile')" href="#">
+      <i class="ti ti-user" aria-hidden="true"></i> Profile
+    </a>
+    <a class="settings-nav-item" onclick="showSection('integrations')" href="#">
+      <i class="ti ti-plug" aria-hidden="true"></i> Integrations
+    </a>
+    <a class="settings-nav-item" onclick="showSection('notifications')" href="#">
+      <i class="ti ti-bell" aria-hidden="true"></i> Notifications
+    </a>
+    <a class="settings-nav-item" onclick="showSection('data')" href="#">
+      <i class="ti ti-shield" aria-hidden="true"></i> Data & privacy
+    </a>
+    <a class="settings-nav-item" onclick="showSection('billing')" href="#">
+      <i class="ti ti-credit-card" aria-hidden="true"></i> Plan & billing
+    </a>
+    <div style="height:1px;background:var(--border);margin:16px 12px"></div>
+    <a class="settings-nav-item" onclick="showSection('danger')" href="#" style="color:var(--red)">
+      <i class="ti ti-alert-triangle" aria-hidden="true"></i> Danger zone
+    </a>
+  </div>
+
+  <div class="main">
+
+    <!-- PROFILE -->
+    <div class="settings-section active" id="section-profile">
+      <h1 class="section-title">Profile</h1>
+      <p class="section-sub">Your business information and account details.</p>
+
+      <div class="settings-card">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">Business information</div>
+            <div class="card-header-sub">This is how Ledger CFO identifies and personalizes your experience</div>
+          </div>
+          <button class="btn-primary" onclick="saveProfile()">Save changes</button>
+        </div>
+        <div class="card-body">
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Business name</div>
+              <div class="card-row-sub">Used in reports and AI responses</div>
+            </div>
+            <div class="card-row-right">
+              <input class="form-input" type="text" id="bizNameInput" value="Rivera Landscaping Co."/>
+            </div>
+          </div>
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Industry</div>
+              <div class="card-row-sub">Helps the AI give more relevant advice</div>
+            </div>
+            <div class="card-row-right">
+              <select class="form-select" id="industrySelect">
+                <option value="landscaping" selected>Landscaping</option>
+                <option value="construction">Construction</option>
+                <option value="healthcare">Healthcare / Medical</option>
+                <option value="legal">Legal / Law firm</option>
+                <option value="marketing">Marketing / Agency</option>
+                <option value="realestate">Real estate</option>
+                <option value="retail">Retail</option>
+                <option value="restaurant">Restaurant / Food</option>
+                <option value="fitness">Fitness / Wellness</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Email address</div>
+              <div class="card-row-sub">For account notifications and reports</div>
+            </div>
+            <div class="card-row-right">
+              <input class="form-input" type="email" id="emailInput" value="owner@riveralandscaping.com"/>
+            </div>
+          </div>
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Revenue goal</div>
+              <div class="card-row-sub">Annual target the AI tracks your progress against</div>
+            </div>
+            <div class="card-row-right">
+              <input class="form-input" type="text" id="revenueGoal" value="$600,000" style="min-width:120px"/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">Password</div>
+            <div class="card-header-sub">Change your account password</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-row">
+            <div class="card-row-label">New password</div>
+            <div class="card-row-right">
+              <input class="form-input" type="password" id="newPasswordInput" placeholder="Min. 8 characters"/>
+            </div>
+          </div>
+          <div class="card-row">
+            <div class="card-row-label">Confirm password</div>
+            <div class="card-row-right">
+              <input class="form-input" type="password" id="confirmPasswordInput" placeholder="Repeat new password"/>
+            </div>
+          </div>
+          <div class="card-row">
+            <div></div>
+            <div class="card-row-right">
+              <button class="btn-outline" onclick="updatePassword()">Update password</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INTEGRATIONS -->
+    <div class="settings-section" id="section-integrations">
+      <h1 class="section-title">Integrations</h1>
+      <p class="section-sub">Connect your financial accounts so Ledger CFO can read your real data automatically.</p>
+
+      <div class="settings-card">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">Accounting & banking</div>
+            <div class="card-header-sub">Pro and Scale plan feature — live data syncs automatically</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="integration-item">
+            <div class="integration-logo">📗</div>
+            <div class="integration-info">
+              <div class="integration-name">QuickBooks Online</div>
+              <div class="integration-desc">Sync P&L, expenses, invoices, and payroll automatically</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="integration-status disconnected"><div class="status-dot off"></div> Not connected</div>
+              <button class="btn-primary" onclick="showToast('QuickBooks connection coming soon — you will be notified when available')">Connect</button>
+            </div>
+          </div>
+          <div class="integration-item">
+            <div class="integration-logo">💳</div>
+            <div class="integration-info">
+              <div class="integration-name">Stripe</div>
+              <div class="integration-desc">Pull payment volume, revenue, and refund data</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="integration-status disconnected"><div class="status-dot off"></div> Not connected</div>
+              <button class="btn-primary" onclick="showToast('Stripe connection coming soon — you will be notified when available')">Connect</button>
+            </div>
+          </div>
+          <div class="integration-item">
+            <div class="integration-logo">🏦</div>
+            <div class="integration-info">
+              <div class="integration-name">Bank account (via Plaid)</div>
+              <div class="integration-desc">Read-only access to transactions and balances</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="integration-status disconnected"><div class="status-dot off"></div> Not connected</div>
+              <button class="btn-primary" onclick="showToast('Bank connection coming soon — you will be notified when available')">Connect</button>
+            </div>
+          </div>
+          <div class="integration-item">
+            <div class="integration-logo">📊</div>
+            <div class="integration-info">
+              <div class="integration-name">Xero</div>
+              <div class="integration-desc">Alternative to QuickBooks — sync all accounting data</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="integration-status disconnected"><div class="status-dot off"></div> Not connected</div>
+              <button class="btn-primary" onclick="showToast('Xero connection coming soon — you will be notified when available')">Connect</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">Manual upload</div>
+            <div class="card-header-sub">Available on all plans — upload files directly to the AI</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Upload a financial document</div>
+              <div class="card-row-sub">PDF, CSV, or Excel — the AI will read it in your next chat</div>
+            </div>
+            <div class="card-row-right">
+              <button class="btn-outline" onclick="showToast('Go to Ask CFO to upload a document')">
+                <i class="ti ti-upload" aria-hidden="true"></i> Upload file
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="settings-section" id="section-notifications">
+      <h1 class="section-title">Notifications</h1>
+      <p class="section-sub">Control when and how Ledger CFO alerts you.</p>
+
+      <div class="settings-card">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">Email notifications</div>
+            <div class="card-header-sub">Sent to your registered email address</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Monthly financial report</div>
+              <div class="card-row-sub">Delivered on the 1st of each month</div>
+            </div>
+            <div class="card-row-right">
+              <label class="toggle"><input type="checkbox" checked onchange="showToast('Preference saved')"/><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Weekly AI insights</div>
+              <div class="card-row-sub">A short summary of what changed this week</div>
+            </div>
+            <div class="card-row-right">
+              <label class="toggle"><input type="checkbox" checked onchange="showToast('Preference saved')"/><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Cash flow alerts</div>
+              <div class="card-row-sub">Notified when cash balance drops below your threshold</div>
+            </div>
+            <div class="card-row-right">
+              <label class="toggle"><input type="checkbox" checked onchange="showToast('Preference saved')"/><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Invoice overdue alerts</div>
+              <div class="card-row-sub">Flagged when an invoice passes 30 days outstanding</div>
+            </div>
+            <div class="card-row-right">
+              <label class="toggle"><input type="checkbox" checked onchange="showToast('Preference saved')"/><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Product updates</div>
+              <div class="card-row-sub">New features and improvements to Ledger CFO</div>
+            </div>
+            <div class="card-row-right">
+              <label class="toggle"><input type="checkbox" onchange="showToast('Preference saved')"/><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">Alert thresholds</div>
+            <div class="card-header-sub">Customize when Ledger CFO flags a concern</div>
+          </div>
+          <button class="btn-primary" onclick="showToast('Thresholds saved')">Save</button>
+        </div>
+        <div class="card-body">
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Cash balance warning threshold</div>
+              <div class="card-row-sub">Alert when balance drops below this amount</div>
+            </div>
+            <div class="card-row-right">
+              <input class="form-input" type="text" value="$10,000" style="min-width:120px"/>
+            </div>
+          </div>
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Invoice overdue threshold</div>
+              <div class="card-row-sub">Alert after this many days outstanding</div>
+            </div>
+            <div class="card-row-right">
+              <select class="form-select">
+                <option>30 days</option>
+                <option>45 days</option>
+                <option>60 days</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA & PRIVACY -->
+    <div class="settings-section" id="section-data">
+      <h1 class="section-title">Data & privacy</h1>
+      <p class="section-sub">Control how your financial data is stored and used.</p>
+
+      <div class="settings-card">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">Data retention</div>
+            <div class="card-header-sub">Choose how long Ledger CFO keeps your data</div>
+          </div>
+          <button class="btn-primary" onclick="showToast('Retention preference saved')">Save</button>
+        </div>
+        <div class="card-body">
+          <div class="retention-options">
+            <label class="retention-option selected" onclick="selectRetention(this)">
+              <input type="radio" name="retention" checked/>
+              <div class="retention-option-text">
+                <h4>Persistent profile</h4>
+                <p>Your data and conversation history are saved between sessions. Ledger CFO builds a financial profile of your business over time, improving its accuracy and personalization.</p>
+              </div>
+            </label>
+            <label class="retention-option" onclick="selectRetention(this)">
+              <input type="radio" name="retention"/>
+              <div class="retention-option-text">
+                <h4>Session only</h4>
+                <p>All uploaded documents and conversation history are permanently deleted when you log out. Nothing is stored between sessions. Maximum privacy, less personalization.</p>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">Your data rights</div>
+            <div class="card-header-sub">You have full control over your data at any time</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Export your data</div>
+              <div class="card-row-sub">Download a copy of everything Ledger CFO has stored</div>
+            </div>
+            <div class="card-row-right">
+              <button class="btn-outline" onclick="showToast('Your data export will be emailed to you within 24 hours')">
+                <i class="ti ti-download" aria-hidden="true"></i> Request export
+              </button>
+            </div>
+          </div>
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Delete all data</div>
+              <div class="card-row-sub">Permanently delete all stored documents and conversation history</div>
+            </div>
+            <div class="card-row-right">
+              <button class="btn-danger" onclick="showToast('Deletion request submitted — processed within 30 days per our Privacy Policy')">
+                <i class="ti ti-trash" aria-hidden="true"></i> Delete my data
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BILLING -->
+    <div class="settings-section" id="section-billing">
+      <h1 class="section-title">Plan & billing</h1>
+      <p class="section-sub">Manage your subscription and payment details.</p>
+
+      <div class="plan-current">
+        <div class="plan-current-info">
+          <h3 id="currentPlanName">Loading...</h3>
+          <p id="currentPlanSub">Managing your subscription</p>
+        </div>
+        <button class="plan-upgrade-btn" onclick="window.location.href='plans.html?upgrade=true'">
+          Change plan
+        </button>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">Payment method</div>
+            <div class="card-header-sub">Billing is managed through Stripe</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Manage payment method & invoices</div>
+              <div class="card-row-sub">Update your card, view billing history, or cancel your subscription</div>
+            </div>
+            <div class="card-row-right">
+              <button class="btn-primary" onclick="openBillingPortal()" id="billingPortalBtn">
+                <i class="ti ti-credit-card" aria-hidden="true"></i> Manage billing
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="card-header">
+          <div>
+            <div class="card-header-title">What's included in your plan</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-row">
+            <div class="card-row-label">AI financial chat</div>
+            <div class="card-row-right" style="color:var(--green);font-size:13px;font-weight:500">✓ Unlimited</div>
+          </div>
+          <div class="card-row">
+            <div class="card-row-label">Financial dashboard</div>
+            <div class="card-row-right" style="color:var(--green);font-size:13px;font-weight:500">✓ Included</div>
+          </div>
+          <div class="card-row">
+            <div class="card-row-label">QuickBooks & Stripe integration</div>
+            <div class="card-row-right" style="color:var(--green);font-size:13px;font-weight:500">✓ Included</div>
+          </div>
+          <div class="card-row">
+            <div class="card-row-label">Monthly AI reports</div>
+            <div class="card-row-right" style="color:var(--gray-light);font-size:13px">Scale plan only</div>
+          </div>
+          <div class="card-row">
+            <div class="card-row-label">Multi-user access</div>
+            <div class="card-row-right" style="color:var(--gray-light);font-size:13px">Scale plan only</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DANGER ZONE -->
+    <div class="settings-section" id="section-danger">
+      <h1 class="section-title" style="color:var(--red)">Danger zone</h1>
+      <p class="section-sub">These actions are permanent and cannot be undone.</p>
+
+      <div class="settings-card" style="margin-bottom:16px">
+        <div class="card-body">
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Sign out</div>
+              <div class="card-row-sub">Sign out of your account on this device.</div>
+            </div>
+            <div class="card-row-right">
+              <button class="btn-outline" onclick="logout()">Sign out</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card" style="border-color:rgba(192,57,43,0.2)">
+        <div class="card-body">
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Cancel subscription</div>
+              <div class="card-row-sub">Your account stays active until the end of the billing period. No refunds for partial months.</div>
+            </div>
+            <div class="card-row-right">
+              <button class="btn-danger" onclick="openBillingPortal()">Cancel subscription</button>
+            </div>
+          </div>
+          <div class="card-row">
+            <div>
+              <div class="card-row-label">Delete account</div>
+              <div class="card-row-sub">Permanently deletes your account, all data, and cancels your subscription immediately. This cannot be undone.</div>
+            </div>
+            <div class="card-row-right">
+              <button class="btn-danger" onclick="confirmDelete()">Delete account</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API='https://ledger-cfo-backend-production.up.railway.app';
+const token=localStorage.getItem('lcfo_token');
+if(!token){window.location.href='login.html';}
+
+const biz=localStorage.getItem('lcfo_business')||'Your Business';
+const plan=localStorage.getItem('lcfo_plan')||'starter';
+document.getElementById('planBadge').textContent=plan.charAt(0).toUpperCase()+plan.slice(1);
+document.getElementById('avatarEl').textContent=biz.charAt(0).toUpperCase();
+document.getElementById('bizNameInput').value=biz;
+const planPrices={starter:'Starter Plan — $49/month',pro:'Pro Plan — $99/month',scale:'Scale Plan — $199/month'};
+document.getElementById('currentPlanName').textContent=planPrices[plan]||planPrices.starter;
+
+// Load real profile data
+async function loadProfile(){
+  try{
+    const res=await fetch(`${API}/api/profile`,{headers:{'Authorization':'Bearer '+token}});
+    if(!res.ok) return;
+    const p=await res.json();
+    if(p.business_name) document.getElementById('bizNameInput').value=p.business_name;
+    if(p.industry) document.getElementById('industrySelect').value=p.industry;
+    if(p.owner_name) document.getElementById('ownerNameInput') && (document.getElementById('ownerNameInput').value=p.owner_name);
+    if(p.plan){
+      document.getElementById('planBadge').textContent=p.plan.charAt(0).toUpperCase()+p.plan.slice(1);
+      document.getElementById('currentPlanName').textContent=planPrices[p.plan]||planPrices.starter;
+      localStorage.setItem('lcfo_plan',p.plan);
+      const subEl=document.getElementById('currentPlanSub');
+      if(subEl){
+        const features={starter:'Chat only · 15 messages/month',pro:'Full dashboard · Unlimited chat',scale:'Full access · Reports + Scenario modeling'};
+        subEl.textContent=features[p.plan]||'';
+      }
+    }
+    if(p.monthly_revenue) document.getElementById('revenueGoal').value='$'+parseInt(p.monthly_revenue).toLocaleString();
+  }catch(e){console.log('Profile load error',e);}
+}
+loadProfile();
+
+async function updatePassword(){
+  const newPass=document.getElementById('newPasswordInput').value;
+  const confirmPass=document.getElementById('confirmPasswordInput').value;
+  if(newPass.length < 8){showToast('Password must be at least 8 characters','var(--red)');return;}
+  if(newPass !== confirmPass){showToast('Passwords do not match','var(--red)');return;}
+  try{
+    const res=await fetch(`${API}/api/auth/update-password`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({password:newPass})
+    });
+    if(res.ok){
+      showToast('Password updated successfully');
+      document.getElementById('newPasswordInput').value='';
+      document.getElementById('confirmPasswordInput').value='';
+    } else {
+      showToast('Could not update password','var(--red)');
+    }
+  }catch(e){showToast('Could not update password','var(--red)');}
+}
+
+function logout(){
+  localStorage.removeItem('lcfo_token');
+  localStorage.removeItem('lcfo_user_id');
+  localStorage.removeItem('lcfo_business');
+  localStorage.removeItem('lcfo_plan');
+  window.location.href='login.html';
+}
+
+function showSection(id){
+  document.querySelectorAll('.settings-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.settings-nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('section-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+async function saveProfile(){
+  const name=document.getElementById('bizNameInput').value.trim();
+  const industry=document.getElementById('industrySelect').value;
+  const revenueRaw=document.getElementById('revenueGoal').value.replace(/[$,]/g,'');
+  const monthly_revenue=parseInt(revenueRaw)||null;
+  if(!name) return;
+  try{
+    const res=await fetch(`${API}/api/profile`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({business_name:name, industry, monthly_revenue})
+    });
+    if(res.ok){
+      localStorage.setItem('lcfo_business',name);
+      document.getElementById('avatarEl').textContent=name.charAt(0).toUpperCase();
+      showToast('Profile saved successfully');
+    } else {
+      showToast('Could not save — please try again','var(--red)');
+    }
+  }catch(e){
+    showToast('Could not save — please try again','var(--red)');
+  }
+}
+
+function selectRetention(el){
+  document.querySelectorAll('.retention-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function showToast(msg,color='var(--charcoal)'){
+  const t=document.getElementById('toast');
+  t.innerHTML='<i class="ti ti-check" aria-hidden="true"></i> '+msg;
+  t.style.background=color;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+async function openBillingPortal(){
+  const btn=document.getElementById('billingPortalBtn');
+  if(btn){btn.textContent='Loading...';btn.disabled=true;}
+  try{
+    const res=await fetch(`${API}/api/stripe/portal`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}
+    });
+    const data=await res.json();
+    if(data.url){
+      window.location.href=data.url;
+    } else {
+      showToast('No billing account found — subscribe first to manage billing','var(--red)');
+      if(btn){btn.textContent='Manage billing';btn.disabled=false;}
+    }
+  }catch(e){
+    showToast('Could not open billing portal','var(--red)');
+    if(btn){btn.textContent='Manage billing';btn.disabled=false;}
+  }
+}
+
+function confirmDelete(){
+  if(confirm('Are you absolutely sure? This permanently deletes your account and all data. This cannot be undone.')){
+    showToast('Account deletion requested — you will receive a confirmation email','var(--red)');
+  }
+}
+</script>
+</body>
+</html>

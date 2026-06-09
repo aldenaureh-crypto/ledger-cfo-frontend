@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ask CFO — Ledger CFO</title>
+  <meta name="description" content="Ask your AI Chief Financial Officer anything about your business finances. Get expert advice instantly."/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#0f2d6b;--navy-light:#1a3f8f;--navy-pale:#eaeffa;
+      --charcoal:#0d1117;--gray:#5a6a7e;--gray-light:#9aaabb;
+      --border:#dde3ee;--cream:#f6f8fc;--white:#fff;
+      --green:#1a6e4a;--green-pale:#e8f5ef;
+      --amber:#b8730a;--amber-pale:#fef3e2;
+    }
+    html,body{height:100%;overflow:hidden}
+    body{font-family:'Epilogue',sans-serif;background:var(--cream);color:var(--charcoal);display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+    /* TOPBAR */
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:var(--white);border-bottom:1px solid var(--border);flex-shrink:0}
+    .topbar-left{display:flex;align-items:center;gap:32px}
+    .nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+    .nav-logo-name{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:700;color:var(--charcoal);letter-spacing:-0.3px;line-height:1}
+    .nav-logo-tag{font-size:9px;font-weight:500;color:var(--navy);letter-spacing:3px;line-height:1}
+    .topbar-nav{display:flex;align-items:center;gap:4px}
+    .topbar-nav a{font-size:13px;font-weight:400;color:var(--gray);text-decoration:none;padding:6px 12px;border-radius:8px;transition:background 0.15s,color 0.15s;display:flex;align-items:center;gap:6px}
+    .topbar-nav a:hover{background:var(--cream);color:var(--charcoal)}
+    .topbar-nav a.active{background:var(--navy-pale);color:var(--navy);font-weight:500}
+    .topbar-right{display:flex;align-items:center;gap:12px}
+    .topbar-plan{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:var(--navy-pale);color:var(--navy);padding:4px 10px;border-radius:100px}
+    .topbar-avatar{width:32px;height:32px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:white;cursor:pointer;font-family:'Cormorant Garamond',serif}
+
+    /* LAYOUT */
+    .layout{display:flex;flex:1;overflow:hidden}
+
+    /* SIDEBAR */
+    .sidebar{width:260px;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+    .sidebar-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .sidebar-title{font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray-light)}
+    .new-chat-btn{font-family:'Epilogue',sans-serif;font-size:12px;font-weight:500;padding:6px 12px;background:var(--navy);color:white;border:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background 0.2s}
+    .new-chat-btn:hover{background:var(--navy-light)}
+    .sidebar-list{flex:1;overflow-y:auto;padding:8px}
+    .sidebar-item{padding:10px 12px;border-radius:8px;cursor:pointer;transition:background 0.15s;margin-bottom:2px}
+    .sidebar-item:hover{background:var(--cream)}
+    .sidebar-item.active{background:var(--navy-pale)}
+    .sidebar-item-title{font-size:13px;font-weight:400;color:var(--charcoal);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sidebar-item.active .sidebar-item-title{color:var(--navy);font-weight:500}
+    .sidebar-item-date{font-size:11px;color:var(--gray-light);font-weight:300}
+    .sidebar-context{padding:16px 20px;border-top:1px solid var(--border);background:var(--cream)}
+    .context-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray-light);margin-bottom:8px}
+    .context-item{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}
+    .context-key{color:var(--gray);font-weight:300}
+    .context-val{color:var(--charcoal);font-weight:500}
+    .context-val.good{color:var(--green)}
+    .context-val.warn{color:var(--amber)}
+
+    /* CHAT AREA */
+    .chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .messages{flex:1;overflow-y:auto;padding:32px;display:flex;flex-direction:column;gap:24px}
+    .messages::-webkit-scrollbar{width:4px}
+    .messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+    /* EMPTY STATE */
+    .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;gap:16px}
+    .empty-icon{width:56px;height:56px;background:var(--navy);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto}
+    .empty-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--charcoal)}
+    .empty-sub{font-size:14px;font-weight:300;color:var(--gray);max-width:360px;line-height:1.7}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}
+    .chip{font-size:13px;padding:8px 16px;border:1px solid var(--border);border-radius:100px;cursor:pointer;background:var(--white);color:var(--charcoal);font-family:'Epilogue',sans-serif;transition:all 0.2s;font-weight:300}
+    .chip:hover{background:var(--navy-pale);border-color:var(--navy);color:var(--navy)}
+
+    /* MESSAGES */
+    .msg{display:flex;gap:12px;align-items:flex-start;animation:msgIn 0.3s ease both;max-width:800px}
+    .msg.user{flex-direction:row-reverse;margin-left:auto}
+    @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .msg-av{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+    .msg-av.ai{background:var(--navy);color:white;font-family:'Cormorant Garamond',serif;font-size:14px}
+    .msg-av.user{background:var(--navy-pale);color:var(--navy)}
+    .msg-bubble{padding:14px 18px;border-radius:4px 16px 16px 16px;font-size:14px;line-height:1.75;font-weight:300;color:var(--charcoal);background:var(--white);border:1px solid var(--border);max-width:680px}
+    .msg.user .msg-bubble{background:var(--navy);color:white;border-color:var(--navy);border-radius:16px 4px 16px 16px;font-weight:400}
+    .msg-bubble strong{font-weight:600}
+    .msg-bubble ul{margin:8px 0 8px 18px}
+    .msg-bubble li{margin-bottom:4px}
+    .msg-bubble .highlight{color:var(--navy);font-weight:600}
+    .msg.user .msg-bubble .highlight{color:#7eb3ff}
+
+    /* TYPING */
+    .typing-bubble{background:var(--white);border:1px solid var(--border);border-radius:4px 16px 16px 16px;padding:14px 18px;display:flex;gap:5px;align-items:center}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--gray-light);animation:bounce 1.2s infinite}
+    .dot:nth-child(2){animation-delay:0.2s}
+    .dot:nth-child(3){animation-delay:0.4s}
+    @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+    /* INPUT */
+    .input-wrap{padding:20px 32px;background:var(--white);border-top:1px solid var(--border);flex-shrink:0}
+    .input-row{display:flex;gap:10px;align-items:flex-end;max-width:800px;margin:0 auto}
+    .upload-btn{width:40px;height:40px;background:var(--cream);border:1px solid var(--border);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray);transition:all 0.2s;flex-shrink:0;position:relative}
+    .upload-btn:hover{background:var(--navy-pale);border-color:var(--navy);color:var(--navy)}
+    .upload-btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+    .chat-input{flex:1;font-family:'Epilogue',sans-serif;font-size:14px;font-weight:300;padding:11px 16px;border:1.5px solid var(--border);border-radius:12px;outline:none;resize:none;max-height:140px;color:var(--charcoal);background:var(--cream);transition:border-color 0.2s,background 0.2s;line-height:1.55}
+    .chat-input:focus{border-color:var(--navy);background:var(--white)}
+    .chat-input::placeholder{color:var(--gray-light)}
+    .send-btn{width:40px;height:40px;background:var(--navy);border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0}
+    .send-btn:hover{background:var(--navy-light);transform:translateY(-1px)}
+    .send-btn:disabled{background:var(--border);cursor:not-allowed;transform:none}
+    .input-note{font-size:11px;color:var(--gray-light);text-align:center;margin-top:8px;max-width:800px;margin-left:auto;margin-right:auto}
+    .file-pill{display:inline-flex;align-items:center;gap:6px;background:var(--navy-pale);border:1px solid rgba(15,45,107,0.15);border-radius:100px;padding:4px 12px;font-size:12px;color:var(--navy);margin-bottom:8px;max-width:800px}
+    .file-pill button{background:none;border:none;cursor:pointer;color:var(--navy);font-size:14px;padding:0;line-height:1;opacity:0.6}
+    .file-pill button:hover{opacity:1}
+
+    /* MOBILE SIDEBAR TOGGLE */
+    .sidebar-toggle{display:none;align-items:center;justify-content:center;width:36px;height:36px;background:var(--cream);border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--charcoal);flex-shrink:0}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(13,17,23,0.4);z-index:90}
+    .sidebar-overlay.show{display:block}
+
+    @media(max-width:700px){
+      html,body{overflow:hidden}
+      .topbar{padding:0 16px;height:56px}
+      .topbar-nav a span{display:none}
+      .topbar-nav a{padding:6px 8px}
+      .topbar-left{gap:8px}
+      .sidebar-toggle{display:flex}
+      .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%);transition:transform 0.3s ease;box-shadow:4px 0 20px rgba(13,17,23,0.15)}
+      .sidebar.open{transform:translateX(0)}
+      .messages{padding:20px 16px;gap:16px}
+      .input-wrap{padding:12px 16px}
+      .empty-title{font-size:22px}
+      .chips{gap:6px}
+      .chip{font-size:12px;padding:6px 12px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a class="nav-logo" href="index.html">
+      <svg width="28" height="28" viewBox="0 0 52 52" fill="none">
+        <rect width="52" height="52" rx="11" fill="#0f2d6b"/>
+        <rect x="10" y="30" width="8" height="14" rx="2" fill="white" opacity="0.45"/>
+        <rect x="22" y="20" width="8" height="24" rx="2" fill="white" opacity="0.7"/>
+        <rect x="34" y="12" width="8" height="32" rx="2" fill="white"/>
+        <polyline points="10,26 26,16 44,8" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+        <circle cx="10" cy="26" r="2.2" fill="white" opacity="0.85"/>
+        <circle cx="26" cy="16" r="2.2" fill="white" opacity="0.85"/>
+        <circle cx="44" cy="8" r="2.2" fill="white" opacity="0.85"/>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:1px">
+        <span class="nav-logo-name">Ledger</span>
+        <span class="nav-logo-tag">CFO</span>
+      </div>
+    </a>
+    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle conversations">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <nav class="topbar-nav">
+      <a href="dashboard.html"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> <span>Dashboard</span></a>
+      <a href="chat.html" class="active"><i class="ti ti-message" aria-hidden="true"></i> <span>Ask CFO</span></a>
+      <a href="reports.html"><i class="ti ti-file-analytics" aria-hidden="true"></i> <span>Reports</span></a>
+      <a href="settings.html"><i class="ti ti-settings" aria-hidden="true"></i> <span>Settings</span></a>
+    </nav>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-plan" id="planBadge">Pro</span>
+    <div class="topbar-avatar" id="avatarEl">R</div>
+  </div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-title">Conversations</span>
+      <button class="new-chat-btn" onclick="newChat()">
+        <i class="ti ti-plus" aria-hidden="true"></i> New
+      </button>
+    </div>
+    <div class="sidebar-list" id="sidebarList"></div>
+    <div class="sidebar-context">
+      <div class="context-label">Business snapshot</div>
+      <div class="context-item">
+        <span class="context-key">Revenue</span>
+        <span class="context-val" id="snapRevenue">—</span>
+      </div>
+      <div class="context-item">
+        <span class="context-key">Industry</span>
+        <span class="context-val" id="snapIndustry">—</span>
+      </div>
+      <div class="context-item">
+        <span class="context-key">Goal</span>
+        <span class="context-val" id="snapGoal" style="font-size:11px;max-width:120px;text-align:right">—</span>
+      </div>
+      <div class="context-item">
+        <span class="context-key">Plan</span>
+        <span class="context-val" id="planContext">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-area">
+    <div class="messages" id="messages">
+      <div class="empty" id="emptyState">
+        <div class="empty-icon">
+          <svg width="28" height="28" viewBox="0 0 52 52" fill="none">
+            <rect x="10" y="30" width="8" height="14" rx="2" fill="white" opacity="0.45"/>
+            <rect x="22" y="20" width="8" height="24" rx="2" fill="white" opacity="0.7"/>
+            <rect x="34" y="12" width="8" height="32" rx="2" fill="white"/>
+            <polyline points="10,26 26,16 44,8" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+            <circle cx="10" cy="26" r="2.2" fill="white" opacity="0.85"/>
+            <circle cx="26" cy="16" r="2.2" fill="white" opacity="0.85"/>
+            <circle cx="44" cy="8" r="2.2" fill="white" opacity="0.85"/>
+          </svg>
+        </div>
+        <h2 class="empty-title">What can I help you with?</h2>
+        <p class="empty-sub">Ask me anything about your finances. I know your numbers and I'll give you straight answers.</p>
+        <div class="chips">
+          <div class="chip" onclick="useChip(this)">Can I afford to hire someone?</div>
+          <div class="chip" onclick="useChip(this)">Why is my cash flow tight?</div>
+          <div class="chip" onclick="useChip(this)">Am I on track for my revenue goal?</div>
+          <div class="chip" onclick="useChip(this)">What should I cut to save money?</div>
+          <div class="chip" onclick="useChip(this)">Should I take out a loan?</div>
+          <div class="chip" onclick="useChip(this)">How much can I pay myself?</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-wrap">
+      <div id="filePill" style="display:none;max-width:800px;margin:0 auto 8px">
+        <div class="file-pill">
+          <i class="ti ti-file" aria-hidden="true"></i>
+          <span id="fileName">document.pdf</span>
+          <button onclick="clearFile()" aria-label="Remove file">×</button>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="upload-btn" title="Upload a financial document">
+          <i class="ti ti-paperclip" style="font-size:16px" aria-hidden="true"></i>
+          <input type="file" accept=".pdf,.csv,.txt,.xlsx" onchange="handleFile(event)" aria-label="Upload document"/>
+        </div>
+        <textarea
+          class="chat-input"
+          id="chatInput"
+          placeholder="Ask your CFO anything about your finances..."
+          rows="1"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="Send message">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+      <p class="input-note">Ledger CFO provides AI analysis, not licensed financial advice. Always consult a qualified professional for major decisions.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const API='https://ledger-cfo-backend-production.up.railway.app';
+let fileContent='',fileNameStr='',messages=[],msgCount=0,busy=false,currentConvId=null;
+
+const token=localStorage.getItem('lcfo_token');
+if(!token){window.location.href='login.html';}
+
+const biz=localStorage.getItem('lcfo_business')||'Your Business';
+const plan=localStorage.getItem('lcfo_plan')||'starter';
+document.getElementById('planBadge').textContent=plan.charAt(0).toUpperCase()+plan.slice(1);
+document.getElementById('planContext').textContent=plan.charAt(0).toUpperCase()+plan.slice(1);
+document.getElementById('avatarEl').textContent=biz.charAt(0).toUpperCase();
+
+// Load conversation history
+async function loadConversations(){
+  try{
+    const res=await fetch(`${API}/api/conversations`,{headers:{'Authorization':'Bearer '+token}});
+    if(!res.ok) return;
+    const convs=await res.json();
+    const list=document.getElementById('sidebarList');
+    list.innerHTML='';
+    convs.forEach(c=>{
+      const item=document.createElement('div');
+      item.className='sidebar-item';
+      item.dataset.id=c.id;
+      const d=new Date(c.created_at);
+      const label=d.toDateString()===new Date().toDateString()?'Today':d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      item.innerHTML=`<div class="sidebar-item-title">${c.title}</div><div class="sidebar-item-date">${label}</div>`;
+      item.onclick=()=>loadConversation(c.id);
+      list.appendChild(item);
+    });
+  }catch(e){console.log('Could not load conversations',e);}
+}
+
+async function loadConversation(convId){
+  currentConvId=convId;
+  messages=[];
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.toggle('active',i.dataset.id===convId));
+  const res=await fetch(`${API}/api/conversations/${convId}/messages`,{headers:{'Authorization':'Bearer '+token}});
+  const msgs=await res.json();
+  const container=document.getElementById('messages');
+  container.innerHTML='';
+  msgs.forEach(m=>{addMsg(m.role==='user'?'user':'ai',m.content);messages.push({role:m.role,content:m.content});});
+}
+
+loadConversations();
+
+// Load real profile into sidebar
+async function loadProfile(){
+  try{
+    const res=await fetch(`${API}/api/profile`,{headers:{'Authorization':'Bearer '+token}});
+    if(!res.ok) return;
+    const p=await res.json();
+    if(p.monthly_revenue) document.getElementById('snapRevenue').textContent='$'+parseInt(p.monthly_revenue).toLocaleString()+'/mo';
+    if(p.industry) document.getElementById('snapIndustry').textContent=p.industry;
+    if(p.goal) document.getElementById('snapGoal').textContent=p.goal;
+    if(p.plan){
+      document.getElementById('planContext').textContent=p.plan.charAt(0).toUpperCase()+p.plan.slice(1);
+      document.getElementById('planBadge').textContent=p.plan.charAt(0).toUpperCase()+p.plan.slice(1);
+    }
+    if(p.business_name){
+      localStorage.setItem('lcfo_business',p.business_name);
+      document.getElementById('avatarEl').textContent=p.business_name.charAt(0).toUpperCase();
+    }
+  }catch(e){console.log('Profile load error',e);}
+}
+loadProfile();
+
+function handleFile(e){
+  const f=e.target.files[0];if(!f)return;
+  fileNameStr=f.name;
+  const r=new FileReader();
+  r.onload=ev=>{
+    fileContent=ev.target.result;
+    document.getElementById('fileName').textContent=f.name;
+    document.getElementById('filePill').style.display='block';
+  };
+  f.name.endsWith('.pdf')?r.readAsDataURL(f):r.readAsText(f);
+}
+
+function clearFile(){
+  fileContent='';fileNameStr='';
+  document.getElementById('filePill').style.display='none';
+}
+
+function useChip(el){
+  document.getElementById('chatInput').value=el.textContent;
+  document.getElementById('chatInput').focus();
+  autoResize(document.getElementById('chatInput'));
+}
+
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,140)+'px';}
+
+function newChat(){
+  messages=[];msgCount=0;fileContent='';fileNameStr='';
+  document.getElementById('filePill').style.display='none';
+  const msgs=document.getElementById('messages');
+  msgs.innerHTML='';
+  const empty=document.createElement('div');
+  empty.className='empty';empty.id='emptyState';
+  empty.innerHTML=`
+    <div class="empty-icon">
+      <svg width="28" height="28" viewBox="0 0 52 52" fill="none">
+        <rect x="10" y="30" width="8" height="14" rx="2" fill="white" opacity="0.45"/>
+        <rect x="22" y="20" width="8" height="24" rx="2" fill="white" opacity="0.7"/>
+        <rect x="34" y="12" width="8" height="32" rx="2" fill="white"/>
+        <polyline points="10,26 26,16 44,8" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+        <circle cx="10" cy="26" r="2.2" fill="white" opacity="0.85"/>
+        <circle cx="26" cy="16" r="2.2" fill="white" opacity="0.85"/>
+        <circle cx="44" cy="8" r="2.2" fill="white" opacity="0.85"/>
+      </svg>
+    </div>
+    <h2 class="empty-title">What can I help you with?</h2>
+    <p class="empty-sub">Ask me anything about your finances. I know your numbers and I'll give you straight answers.</p>
+    <div class="chips">
+      <div class="chip" onclick="useChip(this)">Can I afford to hire someone?</div>
+      <div class="chip" onclick="useChip(this)">Why is my cash flow tight?</div>
+      <div class="chip" onclick="useChip(this)">Am I on track for my revenue goal?</div>
+      <div class="chip" onclick="useChip(this)">What should I cut to save money?</div>
+      <div class="chip" onclick="useChip(this)">Should I take out a loan?</div>
+      <div class="chip" onclick="useChip(this)">How much can I pay myself?</div>
+    </div>`;
+  msgs.appendChild(empty);
+}
+
+function addMsg(role,text){
+  const empty=document.getElementById('emptyState');if(empty)empty.remove();
+  const msgs=document.getElementById('messages');
+  const isUser=role==='user';
+  const wrap=document.createElement('div');
+  wrap.className='msg '+(isUser?'user':'ai');
+  const av=document.createElement('div');
+  av.className='msg-av '+(isUser?'user':'ai');
+  av.textContent=isUser?biz.charAt(0).toUpperCase():'L';
+  const bubble=document.createElement('div');
+  bubble.className='msg-bubble';
+  bubble.innerHTML=fmt(text);
+  wrap.appendChild(av);wrap.appendChild(bubble);
+  msgs.appendChild(wrap);msgs.scrollTop=msgs.scrollHeight;
+}
+
+function fmt(t){
+  return t
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/^#{1,3} (.+)$/gm,'<strong style="font-size:15px">$1</strong>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/s,'<ul>$1</ul>')
+    .replace(/\n\n/g,'</p><p style="margin-top:10px">')
+    .replace(/\n/g,'<br>');
+}
+
+function showTyping(){
+  const msgs=document.getElementById('messages');
+  const w=document.createElement('div');
+  w.className='msg ai';w.id='typing';
+  const av=document.createElement('div');
+  av.className='msg-av ai';av.textContent='L';
+  const b=document.createElement('div');
+  b.className='typing-bubble';
+  b.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  w.appendChild(av);w.appendChild(b);
+  msgs.appendChild(w);msgs.scrollTop=msgs.scrollHeight;
+}
+
+async function sendMessage(){
+  const input=document.getElementById('chatInput');
+  const q=input.value.trim();
+  if(!q||busy)return;
+  busy=true;
+  document.getElementById('sendBtn').disabled=true;
+  input.value='';input.style.height='auto';
+  addMsg('user',q);
+  messages.push({role:'user',content:q});
+  showTyping();
+
+  try{
+    const res=await fetch(`${API}/api/chat`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({message:q,conversation_id:currentConvId})
+    });
+    const d=await res.json();
+    document.getElementById('typing')?.remove();
+    if(res.status===429){
+      document.getElementById('typing')?.remove();
+      addMsg('ai','You\'ve reached your monthly message limit on the Starter plan. <a href="plans.html" style="color:#0f2d6b;font-weight:500">Upgrade to Pro</a> for unlimited conversations with your AI CFO.');
+      busy=false;
+      document.getElementById('sendBtn').disabled=false;
+      return;
+    }
+    if(!res.ok)throw new Error(d.error||'Something went wrong');
+    const reply=d.message;
+    currentConvId=d.conversation_id;
+    addMsg('ai',reply);
+    messages.push({role:'assistant',content:reply});
+    loadConversations();
+  }catch(err){
+    document.getElementById('typing')?.remove();
+    addMsg('ai',err.message||'I encountered an error. Please try again in a moment.');
+  }
+
+  busy=false;
+  document.getElementById('sendBtn').disabled=false;
+}
+
+function toggleSidebar(){
+  const s=document.getElementById('sidebar');
+  const o=document.getElementById('sidebarOverlay');
+  s.classList.toggle('open');
+  o.classList.toggle('show');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — Ledger CFO</title>
+  <meta name="description" content="Your AI-powered financial dashboard. Monitor revenue, expenses, cash flow, and financial health in real time."/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#0f2d6b;--navy-light:#1a3f8f;--navy-pale:#eaeffa;
+      --charcoal:#0d1117;--gray:#5a6a7e;--gray-light:#9aaabb;
+      --border:#dde3ee;--cream:#f6f8fc;--white:#fff;
+      --green:#1a6e4a;--green-pale:#e8f5ef;
+      --amber:#b8730a;--amber-pale:#fef3e2;
+      --red:#c0392b;--red-pale:#fdecea;
+      --shadow-sm:0 1px 4px rgba(13,17,23,0.06);
+      --shadow-md:0 4px 20px rgba(13,17,23,0.08);
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Epilogue',sans-serif;background:var(--cream);color:var(--charcoal);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+    /* TOPBAR */
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:var(--white);border-bottom:1px solid var(--border);flex-shrink:0;position:sticky;top:0;z-index:50}
+    .topbar-left{display:flex;align-items:center;gap:32px}
+    .nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+    .nav-logo-name{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:700;color:var(--charcoal);letter-spacing:-0.3px;line-height:1}
+    .nav-logo-tag{font-size:9px;font-weight:500;color:var(--navy);letter-spacing:3px;line-height:1}
+    .topbar-nav{display:flex;align-items:center;gap:4px}
+    .topbar-nav a{font-size:13px;font-weight:400;color:var(--gray);text-decoration:none;padding:6px 12px;border-radius:8px;transition:background 0.15s,color 0.15s;display:flex;align-items:center;gap:6px}
+    .topbar-nav a:hover{background:var(--cream);color:var(--charcoal)}
+    .topbar-nav a.active{background:var(--navy-pale);color:var(--navy);font-weight:500}
+    .topbar-right{display:flex;align-items:center;gap:12px}
+    .topbar-plan{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:var(--navy-pale);color:var(--navy);padding:4px 10px;border-radius:100px}
+    .topbar-avatar{width:32px;height:32px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:white;cursor:pointer;font-family:'Cormorant Garamond',serif}
+    .demo-banner{background:var(--amber-pale);border-bottom:1px solid rgba(184,115,10,0.2);padding:8px 32px;font-size:12px;color:var(--amber);font-weight:400;display:flex;align-items:center;gap:8px}
+
+    /* MAIN */
+    .main{flex:1;padding:32px;max-width:1280px;margin:0 auto;width:100%}
+
+    /* PAGE HEADER */
+    .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
+    .page-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:var(--charcoal);letter-spacing:-0.5px;line-height:1.1}
+    .page-title span{color:var(--navy);font-style:italic}
+    .page-sub{font-size:14px;color:var(--gray);font-weight:300;margin-top:4px}
+    .header-actions{display:flex;gap:10px;align-items:center}
+    .btn-primary{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:500;padding:9px 18px;background:var(--navy);color:white;border:none;border-radius:8px;cursor:pointer;transition:background 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+    .btn-primary:hover{background:var(--navy-light)}
+    .btn-outline{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:400;padding:9px 18px;background:transparent;color:var(--navy);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:background 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+    .btn-outline:hover{background:var(--navy-pale)}
+
+    /* HEALTH SCORE */
+    .health-row{display:grid;grid-template-columns:1fr 2fr;gap:20px;margin-bottom:20px}
+    .health-card{background:var(--navy);border-radius:16px;padding:28px;display:flex;flex-direction:column;justify-content:space-between;min-height:160px;position:relative;overflow:hidden}
+    .health-card::after{content:'';position:absolute;right:-20px;bottom:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.04)}
+    .health-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px}
+    .health-score{font-family:'Cormorant Garamond',serif;font-size:72px;font-weight:700;color:white;line-height:1;letter-spacing:-2px}
+    .health-score span{font-size:28px;opacity:0.5}
+    .health-status{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.1);border-radius:100px;padding:4px 12px;font-size:12px;font-weight:500;color:rgba(255,255,255,0.8);margin-top:8px}
+    .health-status-dot{width:6px;height:6px;border-radius:50%;background:#6ee9a8}
+    .health-breakdown{display:flex;flex-direction:column;gap:10px;justify-content:center}
+    .health-item{display:flex;align-items:center;gap:12px}
+    .health-item-label{font-size:13px;color:var(--gray);width:120px;flex-shrink:0;font-weight:300}
+    .health-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+    .health-bar{height:100%;border-radius:3px;transition:width 1s ease}
+    .health-item-val{font-size:13px;font-weight:500;color:var(--charcoal);width:36px;text-align:right}
+
+    /* STAT CARDS */
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+    .stat-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px 22px;transition:box-shadow 0.2s}
+    .stat-card:hover{box-shadow:var(--shadow-md)}
+    .stat-label{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray-light);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+    .stat-value{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:var(--charcoal);letter-spacing:-0.5px;line-height:1;margin-bottom:6px}
+    .stat-change{font-size:12px;font-weight:500;display:flex;align-items:center;gap:4px}
+    .stat-change.up{color:var(--green)}
+    .stat-change.down{color:var(--red)}
+    .stat-change.neutral{color:var(--gray)}
+
+    /* CHARTS ROW */
+    .charts-row{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px}
+    .card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px}
+    .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    .card-title{font-size:14px;font-weight:500;color:var(--charcoal)}
+    .card-tag{font-size:11px;color:var(--gray-light);font-weight:300}
+    .chart-wrap{position:relative;height:200px}
+
+    /* ALERTS */
+    .alerts-list{display:flex;flex-direction:column;gap:10px}
+    .alert-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:10px;border:1px solid var(--border)}
+    .alert-item.warning{background:var(--amber-pale);border-color:rgba(184,115,10,0.2)}
+    .alert-item.success{background:var(--green-pale);border-color:rgba(26,110,74,0.15)}
+    .alert-item.info{background:var(--navy-pale);border-color:rgba(15,45,107,0.12)}
+    .alert-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+    .alert-item.warning .alert-icon{background:rgba(184,115,10,0.15);color:var(--amber)}
+    .alert-item.success .alert-icon{background:rgba(26,110,74,0.12);color:var(--green)}
+    .alert-item.info .alert-icon{background:rgba(15,45,107,0.1);color:var(--navy)}
+    .alert-text{font-size:13px;color:var(--charcoal);font-weight:300;line-height:1.5}
+    .alert-text strong{font-weight:500}
+
+    /* BOTTOM ROW */
+    .bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .expense-list{display:flex;flex-direction:column;gap:8px}
+    .expense-item{display:flex;align-items:center;gap:12px}
+    .expense-name{font-size:13px;color:var(--charcoal);font-weight:300;flex:1}
+    .expense-bar-wrap{width:120px;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+    .expense-bar{height:100%;background:var(--navy);border-radius:3px;opacity:0.7}
+    .expense-val{font-size:13px;font-weight:500;color:var(--charcoal);width:64px;text-align:right}
+    .upcoming-list{display:flex;flex-direction:column;gap:10px}
+    .upcoming-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--cream);border-radius:8px}
+    .upcoming-name{font-size:13px;color:var(--charcoal);font-weight:400}
+    .upcoming-date{font-size:12px;color:var(--gray-light);margin-top:2px;font-weight:300}
+    .upcoming-amount{font-size:14px;font-weight:600;font-family:'Cormorant Garamond',serif;color:var(--charcoal)}
+    .upcoming-amount.out{color:var(--red)}
+    .upcoming-amount.in{color:var(--green)}
+
+    /* CHAT CTA */
+    .chat-cta{background:var(--navy);border-radius:14px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;margin-top:20px;flex-wrap:wrap;gap:16px}
+    .chat-cta-text h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:white;margin-bottom:4px}
+    .chat-cta-text p{font-size:13px;color:rgba(255,255,255,0.6);font-weight:300}
+    .chat-cta-btn{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:600;padding:11px 24px;background:white;color:var(--navy);border:none;border-radius:8px;cursor:pointer;transition:opacity 0.2s;text-decoration:none;white-space:nowrap}
+    .chat-cta-btn:hover{opacity:0.9}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .fade1{animation:fadeUp 0.5s 0.05s ease both}
+    .fade2{animation:fadeUp 0.5s 0.1s ease both}
+    .fade3{animation:fadeUp 0.5s 0.15s ease both}
+    .fade4{animation:fadeUp 0.5s 0.2s ease both}
+    .fade5{animation:fadeUp 0.5s 0.25s ease both}
+
+    /* SETUP CARD */
+    .setup-card{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);border-radius:16px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:20px;flex-wrap:wrap;animation:fadeUp 0.5s 0.1s ease both}
+    .setup-card-text h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:white;margin-bottom:5px}
+    .setup-card-text p{font-size:13px;color:rgba(255,255,255,0.65);font-weight:300;line-height:1.5}
+    .setup-card-actions{display:flex;gap:10px;flex-shrink:0;flex-wrap:wrap}
+    .setup-btn-primary{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:600;padding:10px 22px;background:white;color:var(--navy);border:none;border-radius:8px;cursor:pointer;transition:opacity 0.2s;white-space:nowrap}
+    .setup-btn-primary:hover{opacity:0.9}
+    .setup-btn-secondary{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:500;padding:10px 22px;background:rgba(255,255,255,0.12);color:white;border:1px solid rgba(255,255,255,0.25);border-radius:8px;cursor:pointer;transition:background 0.2s;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center}
+    .setup-btn-secondary:hover{background:rgba(255,255,255,0.2)}
+
+    /* SETUP MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(13,17,23,0.5);z-index:300;display:none;align-items:center;justify-content:center;padding:24px}
+    .modal-overlay.show{display:flex}
+    .setup-modal{background:var(--white);border-radius:20px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;box-shadow:0 16px 64px rgba(13,17,23,0.2);animation:fadeUp 0.3s ease both}
+    .setup-modal::-webkit-scrollbar{width:4px}
+    .setup-modal::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+    .modal-header{padding:28px 32px 0;display:flex;align-items:flex-start;justify-content:space-between}
+    .modal-header-text h2{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--charcoal);margin-bottom:4px}
+    .modal-header-text p{font-size:13px;color:var(--gray);font-weight:300}
+    .modal-close{width:32px;height:32px;border-radius:8px;background:var(--cream);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--gray);flex-shrink:0;line-height:1}
+    .modal-close:hover{background:var(--border)}
+    .modal-tabs{display:flex;gap:4px;padding:20px 32px 0;border-bottom:1px solid var(--border);margin-top:20px}
+    .modal-tab{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:500;padding:8px 16px;border:none;background:none;cursor:pointer;color:var(--gray);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.2s}
+    .modal-tab.active{color:var(--navy);border-bottom-color:var(--navy)}
+    .modal-body{padding:24px 32px 32px}
+    .setup-section{margin-bottom:28px}
+    .setup-section-title{font-size:13px;font-weight:600;color:var(--charcoal);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+    .setup-section-sub{font-size:12px;color:var(--gray-light);font-weight:300;margin-bottom:12px;line-height:1.5}
+    .setup-input-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+    .setup-input-label{font-size:13px;color:var(--gray);font-weight:300;white-space:nowrap;min-width:0}
+    .setup-input{font-family:'Epilogue',sans-serif;font-size:14px;font-weight:300;padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--cream);color:var(--charcoal);transition:border-color 0.2s;width:100%}
+    .setup-input:focus{border-color:var(--navy);background:var(--white)}
+    .setup-input::placeholder{color:var(--gray-light)}
+    .setup-prefix{font-size:14px;font-weight:400;color:var(--gray);background:var(--cream);border:1.5px solid var(--border);border-right:none;border-radius:8px 0 0 8px;padding:9px 12px;flex-shrink:0}
+    .setup-input.with-prefix{border-radius:0 8px 8px 0;border-left:none}
+    .expense-rows{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+    .expense-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
+    .expense-row-name{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:300;padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--cream);color:var(--charcoal);transition:border-color 0.2s}
+    .expense-row-name:focus{border-color:var(--navy);background:var(--white)}
+    .expense-row-amt{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:300;padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--cream);color:var(--charcoal);width:120px;transition:border-color 0.2s}
+    .expense-row-amt:focus{border-color:var(--navy);background:var(--white)}
+    .expense-row-del{width:30px;height:30px;border:none;background:none;cursor:pointer;color:var(--gray-light);font-size:18px;display:flex;align-items:center;justify-content:center;border-radius:6px;flex-shrink:0}
+    .expense-row-del:hover{background:var(--red-pale);color:var(--red)}
+    .add-row-btn{font-family:'Epilogue',sans-serif;font-size:13px;color:var(--navy);background:none;border:1.5px dashed var(--border);border-radius:8px;padding:8px 16px;cursor:pointer;width:100%;transition:all 0.2s;font-weight:400}
+    .add-row-btn:hover{border-color:var(--navy);background:var(--navy-pale)}
+    .hint-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .hint-chip{font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:100px;cursor:pointer;background:var(--cream);color:var(--gray);transition:all 0.15s;font-family:'Epilogue',sans-serif}
+    .hint-chip:hover{border-color:var(--navy);background:var(--navy-pale);color:var(--navy)}
+    .modal-footer{padding:0 32px 28px;display:flex;gap:10px;justify-content:flex-end;align-items:center}
+    .modal-save-btn{font-family:'Epilogue',sans-serif;font-size:14px;font-weight:600;padding:12px 28px;background:var(--navy);color:white;border:none;border-radius:10px;cursor:pointer;transition:background 0.2s;box-shadow:0 4px 16px rgba(15,45,107,0.25)}
+    .modal-save-btn:hover{background:var(--navy-light)}
+    .modal-save-btn:disabled{background:var(--border);color:var(--gray-light);cursor:not-allowed;box-shadow:none}
+    .modal-cancel-btn{font-family:'Epilogue',sans-serif;font-size:14px;font-weight:400;padding:12px 20px;background:transparent;color:var(--gray);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:background 0.2s}
+    .modal-cancel-btn:hover{background:var(--cream)}
+    .self-reported-tag{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--green);background:var(--green-pale);padding:2px 8px;border-radius:100px;margin-left:6px}
+    .upload-tab-content{text-align:center;padding:40px 20px}
+    .upload-tab-content .upload-icon{width:64px;height:64px;background:var(--navy-pale);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}
+    .upload-tab-content h3{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--charcoal);margin-bottom:8px}
+    .upload-tab-content p{font-size:14px;color:var(--gray);font-weight:300;line-height:1.7;margin-bottom:24px;max-width:380px;margin-left:auto;margin-right:auto}
+    .upload-tab-content a{display:inline-flex;align-items:center;gap:8px;font-family:'Epilogue',sans-serif;font-size:14px;font-weight:600;padding:13px 28px;background:var(--navy);color:white;border-radius:10px;text-decoration:none;transition:background 0.2s}
+    .upload-tab-content a:hover{background:var(--navy-light)}
+    .upload-formats{font-size:12px;color:var(--gray-light);margin-top:14px;font-weight:300}
+
+    /* UPGRADE GATE */
+    .upgrade-gate{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(246,248,252,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+    .upgrade-gate-card{background:var(--white);border:1px solid var(--border);border-radius:24px;box-shadow:0 8px 48px rgba(13,17,23,0.14);max-width:480px;width:100%;padding:48px 44px;text-align:center;animation:fadeUp 0.5s ease both}
+    .upgrade-gate-icon{width:64px;height:64px;background:var(--navy-pale);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:28px}
+    .upgrade-gate-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--navy);margin-bottom:10px}
+    .upgrade-gate-title{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;color:var(--charcoal);letter-spacing:-0.5px;line-height:1.1;margin-bottom:12px}
+    .upgrade-gate-sub{font-size:14px;font-weight:300;color:var(--gray);line-height:1.7;margin-bottom:32px}
+    .upgrade-gate-features{display:flex;flex-direction:column;gap:10px;margin-bottom:32px;text-align:left}
+    .upgrade-gate-feature{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--charcoal);font-weight:300}
+    .upgrade-gate-feature-dot{width:6px;height:6px;border-radius:50%;background:var(--navy);flex-shrink:0}
+    .upgrade-gate-btn{display:inline-block;width:100%;font-family:'Epilogue',sans-serif;font-size:15px;font-weight:600;padding:15px;background:var(--navy);color:white;border:none;border-radius:10px;cursor:pointer;text-decoration:none;transition:background 0.2s;box-shadow:0 4px 16px rgba(15,45,107,0.25);margin-bottom:14px}
+    .upgrade-gate-btn:hover{background:var(--navy-light)}
+    .upgrade-gate-skip{font-size:13px;color:var(--gray-light);cursor:pointer;text-decoration:underline;background:none;border:none;font-family:'Epilogue',sans-serif}
+    .upgrade-gate-skip:hover{color:var(--gray)}
+
+    @media(max-width:900px){
+      .stats-grid{grid-template-columns:repeat(2,1fr)}
+      .charts-row,.bottom-row,.health-row{grid-template-columns:1fr}
+    }
+    @media(max-width:640px){
+      .topbar{padding:0 16px;height:56px}
+      .topbar-nav a span{display:none}
+      .topbar-nav a{padding:6px 8px}
+      .topbar-nav{gap:2px}
+      .demo-banner{padding:8px 16px}
+      .main{padding:20px 16px}
+      .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+      .stat-value{font-size:26px}
+      .page-title{font-size:26px}
+      .health-score{font-size:56px}
+      .upgrade-gate-card{padding:32px 24px}
+      .upgrade-gate-title{font-size:28px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a class="nav-logo" href="index.html">
+      <svg width="28" height="28" viewBox="0 0 52 52" fill="none">
+        <rect width="52" height="52" rx="11" fill="#0f2d6b"/>
+        <rect x="10" y="30" width="8" height="14" rx="2" fill="white" opacity="0.45"/>
+        <rect x="22" y="20" width="8" height="24" rx="2" fill="white" opacity="0.7"/>
+        <rect x="34" y="12" width="8" height="32" rx="2" fill="white"/>
+        <polyline points="10,26 26,16 44,8" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+        <circle cx="10" cy="26" r="2.2" fill="white" opacity="0.85"/>
+        <circle cx="26" cy="16" r="2.2" fill="white" opacity="0.85"/>
+        <circle cx="44" cy="8" r="2.2" fill="white" opacity="0.85"/>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:1px">
+        <span class="nav-logo-name">Ledger</span>
+        <span class="nav-logo-tag">CFO</span>
+      </div>
+    </a>
+    <nav class="topbar-nav">
+      <a href="dashboard.html" class="active">
+        <i class="ti ti-layout-dashboard" aria-hidden="true"></i> <span>Dashboard</span>
+      </a>
+      <a href="chat.html">
+        <i class="ti ti-message" aria-hidden="true"></i> <span>Ask CFO</span>
+      </a>
+      <a href="reports.html">
+        <i class="ti ti-file-analytics" aria-hidden="true"></i> <span>Reports</span>
+      </a>
+      <a href="settings.html">
+        <i class="ti ti-settings" aria-hidden="true"></i> <span>Settings</span>
+      </a>
+    </nav>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-plan" id="planBadge">...</span>
+    <div class="topbar-avatar" id="avatarEl">...</div>
+  </div>
+</div>
+
+<!-- UPGRADE GATE (shown for starter plan) -->
+<div class="upgrade-gate" id="upgradeGate" style="display:none">
+  <div class="upgrade-gate-card">
+    <div class="upgrade-gate-icon">📊</div>
+    <p class="upgrade-gate-label">Pro Feature</p>
+    <h2 class="upgrade-gate-title">Unlock your full dashboard.</h2>
+    <p class="upgrade-gate-sub">The financial dashboard is available on the Pro plan. Upgrade to see your revenue trends, expense breakdowns, cash flow, and financial health score — all in one place.</p>
+    <div class="upgrade-gate-features">
+      <div class="upgrade-gate-feature"><div class="upgrade-gate-feature-dot"></div>Full financial dashboard & KPIs</div>
+      <div class="upgrade-gate-feature"><div class="upgrade-gate-feature-dot"></div>Revenue & expense charts</div>
+      <div class="upgrade-gate-feature"><div class="upgrade-gate-feature-dot"></div>Financial health score</div>
+      <div class="upgrade-gate-feature"><div class="upgrade-gate-feature-dot"></div>Unlimited CFO conversations</div>
+    </div>
+    <a href="plans.html?upgrade=true" class="upgrade-gate-btn">Upgrade to Pro →</a><br>
+    <button class="upgrade-gate-skip" onclick="document.getElementById('upgradeGate').style.display='none'">Continue with Starter (chat only)</button>
+  </div>
+</div>
+
+
+<div class="main">
+
+  <div class="page-header fade1">
+    <div>
+      <h1 class="page-title"><span id="pageGreeting">Good morning.</span></h1>
+      <p class="page-sub" id="pageSub">Here's your financial snapshot.</p>
+    </div>
+    <div class="header-actions">
+      <a href="chat.html" class="btn-outline">
+        <i class="ti ti-message" aria-hidden="true"></i> Ask your CFO
+      </a>
+      <a href="settings.html" class="btn-primary">
+        <i class="ti ti-plug" aria-hidden="true"></i> Connect accounts
+      </a>
+    </div>
+  </div>
+
+  <!-- SETUP CARD — shown until financial data is entered -->
+  <div class="setup-card" id="setupCard" style="display:none">
+    <div class="setup-card-text">
+      <h3>Unlock your full dashboard.</h3>
+      <p>Add your financial numbers to see profit, cash balance, expenses, and more — takes 2 minutes.</p>
+    </div>
+    <div class="setup-card-actions">
+      <button class="setup-btn-primary" onclick="openSetupModal('manual')">Enter my numbers →</button>
+      <a class="setup-btn-secondary" href="chat.html?upload=1">Upload a file</a>
+    </div>
+  </div>
+
+  <!-- HEALTH SCORE -->
+  <div class="health-row fade2" id="healthSection" style="display:none">
+    <div class="health-card">
+      <div>
+        <div class="health-label">Financial Health Score</div>
+        <div class="health-score"><span id="healthScoreNum">--</span><span>/100</span></div>
+      </div>
+      <div class="health-status"><div class="health-status-dot"></div><span id="healthStatus">Calculating...</span></div>
+    </div>
+    <div class="card" style="padding:20px 24px">
+      <div class="card-header" style="margin-bottom:16px">
+        <span class="card-title">Score breakdown</span>
+        <span class="card-tag">Updated today</span>
+      </div>
+      <div class="health-breakdown">
+        <div class="health-item">
+          <span class="health-item-label">Cash flow</span>
+          <div class="health-bar-wrap"><div class="health-bar" id="bar_cashflow" style="width:0%"></div></div><span class="health-item-val" id="val_cashflow">--</span>
+        </div>
+        <div class="health-item">
+          <span class="health-item-label">Profit margin</span>
+          <div class="health-bar-wrap"><div class="health-bar" id="bar_profit" style="width:0%"></div></div><span class="health-item-val" id="val_profit">--</span>
+        </div>
+        <div class="health-item">
+          <span class="health-item-label">Expense control</span>
+          <div class="health-bar-wrap"><div class="health-bar" id="bar_expenses" style="width:0%"></div></div><span class="health-item-val" id="val_expenses">--</span>
+        </div>
+        <div class="health-item">
+          <span class="health-item-label">Revenue growth</span>
+          <div class="health-bar-wrap"><div class="health-bar" id="bar_revenue" style="width:0%"></div></div><span class="health-item-val" id="val_revenue">--</span>
+        </div>
+        <div class="health-item">
+          <span class="health-item-label">Debt ratio</span>
+          <div class="health-bar-wrap"><div class="health-bar" id="bar_debt" style="width:0%"></div></div><span class="health-item-val" id="val_debt">--</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEALTH SCORE EMPTY STATE -->
+  <div class="fade2" id="healthEmpty" style="display:none;background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px 32px;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+    <div>
+      <div style="font-size:14px;font-weight:500;color:var(--charcoal);margin-bottom:4px">Financial Health Score</div>
+      <div style="font-size:13px;color:var(--gray);font-weight:300">Add your financial numbers to unlock your score — cash flow, margins, expenses and more.</div>
+    </div>
+    <button class="btn-primary" onclick="openSetupModal()">Add your numbers</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid fade3">
+    <div class="stat-card">
+      <div class="stat-label"><i class="ti ti-cash" style="font-size:14px" aria-hidden="true"></i> Monthly revenue</div>
+      <div class="stat-value" id="stat-revenue">—</div>
+      <div class="stat-change neutral" id="stat-revenue-sub">From your profile</div>
+    </div>
+    <div class="stat-card" style="position:relative">
+      <div class="stat-label"><i class="ti ti-trending-up" style="font-size:14px" aria-hidden="true"></i> Net profit</div>
+      <div class="stat-value" id="stat-profit" style="font-size:22px;color:var(--gray-light);font-family:'Epilogue',sans-serif;font-weight:300">Add numbers</div>
+      <div class="stat-change neutral">Enter your expenses below</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><i class="ti ti-wallet" style="font-size:14px" aria-hidden="true"></i> Cash balance</div>
+      <div class="stat-value" id="stat-cash" style="font-size:22px;color:var(--gray-light);font-family:'Epilogue',sans-serif;font-weight:300">Add numbers</div>
+      <div class="stat-change neutral">Enter your balance below</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><i class="ti ti-receipt" style="font-size:14px" aria-hidden="true"></i> Outstanding invoices</div>
+      <div class="stat-value" id="stat-invoices" style="font-size:22px;color:var(--gray-light);font-family:'Epilogue',sans-serif;font-weight:300">Add numbers</div>
+      <div class="stat-change neutral">Enter what you're owed</div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts-row fade4">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Revenue vs expenses</span>
+        <span class="card-tag">Last 6 months</span>
+      </div>
+      <div class="chart-wrap" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px">
+        <div style="width:48px;height:48px;border-radius:12px;background:var(--navy-pale);display:flex;align-items:center;justify-content:center;font-size:22px">📈</div>
+        <p style="font-size:14px;color:var(--gray);font-weight:300;text-align:center;line-height:1.6">Connect your accounts to see real<br>revenue and expense trends over time.</p>
+        <a href="settings.html" style="font-size:13px;color:var(--navy);font-weight:500;text-decoration:none">Connect accounts →</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">AI insights</span>
+        <span class="card-tag" id="alertsTag">Based on your profile</span>
+      </div>
+      <div class="alerts-list" id="alertsList">
+        <div class="alert-item info">
+          <div class="alert-icon"><i class="ti ti-message" aria-hidden="true"></i></div>
+          <div class="alert-text"><strong>Your CFO is ready.</strong> Ask a question below to get financial advice personalized to your business.</div>
+        </div>
+        <div class="alert-item info" id="goalAlert" style="display:none">
+          <div class="alert-icon"><i class="ti ti-target" aria-hidden="true"></i></div>
+          <div class="alert-text" id="goalAlertText"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM ROW -->
+  <div class="bottom-row fade5">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Top expenses this month</span>
+        <span class="card-tag">Awaiting data</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;gap:12px;text-align:center">
+        <div style="width:44px;height:44px;border-radius:10px;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:20px">🧾</div>
+        <p style="font-size:14px;color:var(--gray);font-weight:300;line-height:1.6">Connect your bank or accounting software<br>to see a real expense breakdown.</p>
+        <a href="settings.html" style="font-size:13px;color:var(--navy);font-weight:500;text-decoration:none">Connect accounts →</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Upcoming cash flow</span>
+        <span class="card-tag">Next 30 days</span>
+      </div>
+      <div class="upcoming-list" id="upcomingList">
+        <div style="text-align:center;padding:32px 16px">
+          <p style="font-size:14px;color:var(--gray);font-weight:300;line-height:1.7">No upcoming transactions yet.<br>Connect your accounts in Settings to track cash flow.</p>
+          <a href="settings.html" style="display:inline-block;margin-top:12px;font-size:13px;color:var(--navy);font-weight:500;text-decoration:none">Connect accounts →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETUP MODAL -->
+  <div class="modal-overlay" id="setupModalOverlay" onclick="handleModalClick(event)">
+    <div class="setup-modal" id="setupModal">
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <h2>Set up your dashboard.</h2>
+          <p>The more you share, the smarter your CFO gets.</p>
+        </div>
+        <button class="modal-close" onclick="closeSetupModal()">×</button>
+      </div>
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tab-manual" onclick="switchTab('manual')">Enter manually</button>
+        <button class="modal-tab" id="tab-upload" onclick="switchTab('upload')">Upload a file</button>
+      </div>
+
+      <!-- MANUAL TAB -->
+      <div class="modal-body" id="body-manual">
+
+        <div class="setup-section">
+          <div class="setup-section-title">💰 Cash & liquidity</div>
+          <div class="setup-section-sub">Needed for: Cash balance card, runway alerts, and liquidity advice from your CFO.</div>
+          <div class="setup-input-row">
+            <span class="setup-prefix">$</span>
+            <input class="setup-input with-prefix" type="number" id="inp-cash" placeholder="e.g. 12,000 — your current bank balance"/>
+          </div>
+          <div class="setup-input-row">
+            <span class="setup-prefix">$</span>
+            <input class="setup-input with-prefix" type="number" id="inp-invoices" placeholder="e.g. 4,500 — what customers currently owe you"/>
+          </div>
+          <div class="hint-chips">
+            <span style="font-size:11px;color:var(--gray-light);font-weight:300">Examples:</span>
+            <span class="hint-chip" onclick="document.getElementById('inp-cash').value=5000">$5,000 cash</span>
+            <span class="hint-chip" onclick="document.getElementById('inp-cash').value=15000">$15,000 cash</span>
+            <span class="hint-chip" onclick="document.getElementById('inp-invoices').value=2500">$2,500 owed</span>
+            <span class="hint-chip" onclick="document.getElementById('inp-invoices').value=8000">$8,000 owed</span>
+          </div>
+        </div>
+
+        <div class="setup-section">
+          <div class="setup-section-title">🧾 Monthly expenses</div>
+          <div class="setup-section-sub">Needed for: Net profit card, expense breakdown chart, and cost advice. Add each category you spend money on — name it however you like.</div>
+          <div class="expense-rows" id="expenseRows"></div>
+          <button class="add-row-btn" onclick="addExpenseRow()">+ Add expense category</button>
+          <div class="hint-chips" style="margin-top:12px">
+            <span style="font-size:11px;color:var(--gray-light);font-weight:300">Quick add:</span>
+            <span class="hint-chip" onclick="addExpenseRow('Rent / Office')">Rent / Office</span>
+            <span class="hint-chip" onclick="addExpenseRow('Payroll / Contractors')">Payroll</span>
+            <span class="hint-chip" onclick="addExpenseRow('Software & tools')">Software</span>
+            <span class="hint-chip" onclick="addExpenseRow('Marketing & ads')">Marketing</span>
+            <span class="hint-chip" onclick="addExpenseRow('Insurance')">Insurance</span>
+            <span class="hint-chip" onclick="addExpenseRow('Inventory / COGS')">Inventory</span>
+            <span class="hint-chip" onclick="addExpenseRow('Vehicle / Transport')">Vehicle</span>
+            <span class="hint-chip" onclick="addExpenseRow('Professional fees')">Professional fees</span>
+          </div>
+        </div>
+
+        <div id="profitPreview" style="display:none;background:var(--green-pale);border:1px solid rgba(26,110,74,0.15);border-radius:10px;padding:14px 18px;margin-bottom:8px">
+          <div style="font-size:12px;color:var(--green);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Estimated net profit</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--green)" id="profitPreviewNum">—</div>
+          <div style="font-size:12px;color:var(--gray);font-weight:300;margin-top:2px">Monthly revenue minus your total expenses</div>
+        </div>
+
+      </div>
+
+      <!-- UPLOAD TAB -->
+      <div class="modal-body" id="body-upload" style="display:none">
+        <div class="upload-tab-content">
+          <div class="upload-icon">📎</div>
+          <h3>Upload your financials.</h3>
+          <p>Drop a bank statement, P&L, or spreadsheet into the chat and your AI CFO will read it, summarize it, and update your insights automatically.</p>
+          <a href="chat.html?upload=1">Go to CFO chat to upload →</a>
+          <div class="upload-formats">Supports: PDF, CSV, XLSX, images of statements</div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="modal-cancel-btn" onclick="closeSetupModal()">Cancel</button>
+        <button class="modal-save-btn" id="modalSaveBtn" onclick="saveFinances()">Save & update dashboard →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT CTA -->
+  <div class="chat-cta fade5">
+    <div class="chat-cta-text">
+      <h3>Have a question about these numbers?</h3>
+      <p>Ask your AI CFO anything — it knows your business inside and out.</p>
+    </div>
+    <a href="chat.html" class="chat-cta-btn">Ask your CFO →</a>
+  </div>
+
+</div>
+
+<script>
+const API='https://ledger-cfo-backend-production.up.railway.app';
+
+// Protect route
+const token=localStorage.getItem('lcfo_token');
+if(!token){window.location.href='login.html';}
+
+// If returning from Stripe checkout, sync plan from Stripe then reload
+if(new URLSearchParams(window.location.search).get('upgraded')==='true'){
+  window.history.replaceState({},'',window.location.pathname);
+  fetch(`${API}/api/stripe/sync`, {
+    method:'POST',
+    headers:{'Authorization':'Bearer '+token}
+  }).then(r=>r.json()).then(d=>{
+    if(d.plan) localStorage.setItem('lcfo_plan', d.plan);
+    setTimeout(()=>showToast && showToast('🎉 Subscription activated! Welcome to your '+d.plan+' plan.'), 800);
+  }).catch(()=>{});
+}
+
+
+// Greet while loading
+const hr=new Date().getHours();
+const tod=hr<12?'Good morning':hr<17?'Good afternoon':'Good evening';
+document.getElementById('pageGreeting').textContent=tod+'.';
+
+async function loadDashboard(){
+  try{
+    const res=await fetch(`${API}/api/profile`,{headers:{'Authorization':'Bearer '+token}});
+    if(!res.ok) throw new Error('Could not load profile');
+    const profile=await res.json();
+
+    // Redirect to onboarding if profile is incomplete
+    if(!profile.business_name || !profile.business_name.trim() || !profile.industry){
+      window.location.href='onboarding.html';
+      return;
+    }
+
+    const biz=profile.business_name||'Your Business';
+    const owner=profile.owner_name||'';
+    const revenue=parseInt(profile.monthly_revenue)||0;
+    const plan=profile.plan||'starter';
+
+    // Update header
+    document.getElementById('avatarEl').textContent=biz.charAt(0).toUpperCase();
+    document.getElementById('planBadge').textContent=plan.charAt(0).toUpperCase()+plan.slice(1);
+    document.getElementById('pageGreeting').textContent=owner?`${tod}, ${owner}.`:`${tod}.`;
+    document.getElementById('pageSub').textContent=`Here's the financial snapshot for ${biz}.`;
+
+    // Store for other pages
+    localStorage.setItem('lcfo_business',biz);
+    localStorage.setItem('lcfo_plan',plan);
+    localStorage.setItem('lcfo_revenue',revenue);
+
+    // Feature gating — show upgrade overlay for Starter plan
+    if(plan==='starter'){
+      document.getElementById('upgradeGate').style.display='flex';
+    }
+
+    // Health score — only show if user has entered financial data
+    const fin = profile.finances_manual;
+    if(fin && fin.total_expenses && revenue > 0){
+      document.getElementById('healthSection').style.display='grid';
+      document.getElementById('healthEmpty').style.display='none';
+
+      function calcScore(){
+        let score = 50;
+        if(revenue > 100000) score += 15;
+        else if(revenue > 50000) score += 10;
+        else if(revenue > 20000) score += 5;
+        const margin = ((revenue - (fin.total_expenses||0)) / revenue) * 100;
+        if(margin > 30) score += 12;
+        else if(margin > 15) score += 7;
+        else if(margin > 0) score += 3;
+        if(fin.cash_balance > revenue * 3) score += 8;
+        else if(fin.cash_balance > revenue) score += 4;
+        if(profile.employees >= 6) score += 5;
+        else if(profile.employees >= 2) score += 3;
+        return Math.min(92, Math.max(35, score));
+      }
+
+      const healthScore = calcScore();
+      document.getElementById('healthScoreNum').textContent = healthScore;
+
+      const margin = Math.max(0, Math.round(((revenue - (fin.total_expenses||0)) / revenue) * 100));
+      const cashScore = Math.min(95, fin.cash_balance > 0 ? Math.round((fin.cash_balance / (revenue * 3)) * 100) : 20);
+      const subScores = {
+        cashflow: Math.min(95, cashScore),
+        profit: Math.min(90, margin),
+        expenses: Math.min(90, fin.total_expenses < revenue * 0.5 ? 80 : fin.total_expenses < revenue * 0.7 ? 60 : 40),
+        revenue: Math.min(92, healthScore + 3),
+        debt: Math.min(85, healthScore - 5)
+      };
+      Object.entries(subScores).forEach(([key, val]) => {
+        const bar = document.getElementById('bar_' + key);
+        const valEl = document.getElementById('val_' + key);
+        if(bar){ bar.style.width = val + '%'; bar.style.background = val >= 70 ? '#1a6e4a' : val >= 50 ? '#0f2d6b' : '#b8730a'; }
+        if(valEl) valEl.textContent = val;
+      });
+
+      const statusEl = document.getElementById('healthStatus');
+      if(statusEl){
+        if(healthScore >= 75) statusEl.textContent = 'Good — above industry average';
+        else if(healthScore >= 60) statusEl.textContent = 'Fair — room to improve';
+        else statusEl.textContent = 'Needs attention — act now';
+      }
+    } else {
+      document.getElementById('healthSection').style.display='none';
+      if(plan !== 'starter'){ const he=document.getElementById('healthEmpty'); he.style.display='flex'; }
+    }
+
+    // Show real revenue stat
+    if(revenue > 0){
+      const revEl=document.getElementById('stat-revenue');
+      if(revEl) revEl.textContent='$'+revenue.toLocaleString();
+      const revSub=document.getElementById('stat-revenue-sub');
+      if(revSub) revSub.textContent='Monthly · from your profile';
+    }
+
+    // Show goal-based insight
+    const goalMessages={
+      cashflow:'Your top priority is cash flow. Ask your CFO to walk you through a cash flow audit for your business.',
+      growth:'Your goal is revenue growth. Ask your CFO what the highest-leverage moves are to hit your next milestone.',
+      expenses:'Your focus is cutting costs. Ask your CFO to identify where businesses like yours typically overspend.',
+      hiring:'You\'re thinking about hiring. Ask your CFO how to know when you can actually afford your next team member.',
+    };
+    const goalMsg=goalMessages[profile.goal];
+    if(goalMsg){
+      const goalAlert=document.getElementById('goalAlert');
+      const goalAlertText=document.getElementById('goalAlertText');
+      if(goalAlert && goalAlertText){
+        goalAlertText.innerHTML='<strong>Based on your goal.</strong> '+goalMsg;
+        goalAlert.style.display='flex';
+      }
+    }
+
+    // Load financial data if available
+    const fin=profile.finances_manual;
+    if(fin && (fin.cash_balance||fin.outstanding_invoices||fin.expenses?.length)){
+      populateFinancials(fin, revenue);
+    } else {
+      // Show setup card
+      if(plan!=='starter') document.getElementById('setupCard').style.display='flex';
+    }
+
+  }catch(e){
+    console.error('Dashboard load error:', e);
+  }
+}
+
+function fmt(n){return '$'+Math.round(n).toLocaleString();}
+
+function populateFinancials(fin, revenue){
+  // Hide setup card
+  document.getElementById('setupCard').style.display='none';
+
+  const tag='<span class="self-reported-tag">Self-reported</span>';
+
+  // Cash balance
+  if(fin.cash_balance){
+    const el=document.getElementById('stat-cash');
+    if(el){el.textContent=fmt(fin.cash_balance);el.insertAdjacentHTML('afterend',tag);}
+    const sub=el?.nextElementSibling?.nextElementSibling;
+    const cashCard=document.getElementById('stat-cash')?.closest('.stat-card');
+    if(cashCard){
+      const changeEl=cashCard.querySelector('.stat-change');
+      if(changeEl) changeEl.textContent='Current bank balance';
+    }
+  }
+
+  // Outstanding invoices
+  if(fin.outstanding_invoices){
+    const el=document.getElementById('stat-invoices');
+    if(el){el.textContent=fmt(fin.outstanding_invoices);el.insertAdjacentHTML('afterend',tag);}
+    const invCard=el?.closest('.stat-card');
+    if(invCard){const changeEl=invCard.querySelector('.stat-change');if(changeEl)changeEl.textContent='Awaiting payment';}
+  }
+
+  // Net profit
+  const totalExp=fin.total_expenses||0;
+  if(totalExp>0 && revenue>0){
+    const profit=revenue-totalExp;
+    const el=document.getElementById('stat-profit');
+    if(el){
+      el.style.fontFamily="'Cormorant Garamond',serif";
+      el.style.fontSize='32px';
+      el.style.color=profit>=0?'var(--charcoal)':'var(--red)';
+      el.textContent=fmt(Math.abs(profit));
+      el.insertAdjacentHTML('afterend',tag);
+    }
+    const profCard=el?.closest('.stat-card');
+    if(profCard){
+      const changeEl=profCard.querySelector('.stat-change');
+      if(changeEl){
+        changeEl.className='stat-change '+(profit>=0?'up':'down');
+        const margin=revenue>0?Math.round((profit/revenue)*100):0;
+        changeEl.textContent=(profit>=0?'↑':'↓')+' '+Math.abs(margin)+'% margin';
+      }
+    }
+  }
+
+  // Expense breakdown
+  if(fin.expenses && fin.expenses.length>0){
+    const container=document.querySelector('.bottom-row .card:first-child');
+    if(container){
+      const maxAmt=Math.max(...fin.expenses.map(e=>e.amount||0));
+      let html=`<div class="card-header"><span class="card-title">Top expenses this month</span><span class="card-tag">Self-reported</span></div><div class="expense-list">`;
+      fin.expenses.forEach(exp=>{
+        if(!exp.amount) return;
+        const pct=maxAmt>0?Math.round((exp.amount/maxAmt)*100):0;
+        html+=`<div class="expense-item"><span class="expense-name">${exp.name}</span><div class="expense-bar-wrap"><div class="expense-bar" style="width:${pct}%"></div></div><span class="expense-val">${fmt(exp.amount)}</span></div>`;
+      });
+      html+=`</div><p style="font-size:12px;color:var(--gray-light);margin-top:16px;font-weight:300"><button onclick="openSetupModal('manual')" style="background:none;border:none;color:var(--navy);cursor:pointer;font-size:12px;font-family:'Epilogue',sans-serif;font-weight:500;padding:0">Edit numbers</button></p>`;
+      container.innerHTML=html;
+    }
+  }
+}
+
+// ── SETUP MODAL ────────────────────────────────────────────────────────────────
+function openSetupModal(tab){
+  tab=tab||'manual';
+  document.getElementById('setupModalOverlay').classList.add('show');
+  document.body.style.overflow='hidden';
+  switchTab(tab);
+  // Seed expense rows if none exist
+  if(document.getElementById('expenseRows').children.length===0){
+    addExpenseRow('');
+  }
+}
+
+function closeSetupModal(){
+  document.getElementById('setupModalOverlay').classList.remove('show');
+  document.body.style.overflow='';
+}
+
+function handleModalClick(e){
+  if(e.target===document.getElementById('setupModalOverlay')) closeSetupModal();
+}
+
+function switchTab(tab){
+  ['manual','upload'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('body-'+t).style.display=t===tab?'block':'none';
+  });
+  document.getElementById('modalSaveBtn').style.display=tab==='manual'?'block':'none';
+}
+
+function addExpenseRow(name){
+  const rows=document.getElementById('expenseRows');
+  const div=document.createElement('div');
+  div.className='expense-row';
+  div.innerHTML=`<input class="expense-row-name" type="text" placeholder="Expense name (e.g. Software & tools)" value="${name||''}"/><input class="expense-row-amt" type="number" placeholder="$ amount" oninput="updateProfitPreview()"/><button class="expense-row-del" onclick="this.closest('.expense-row').remove();updateProfitPreview()">×</button>`;
+  rows.appendChild(div);
+  if(name) div.querySelector('.expense-row-amt').focus();
+  else div.querySelector('.expense-row-name').focus();
+}
+
+function updateProfitPreview(){
+  const revenue=parseInt(localStorage.getItem('lcfo_revenue'))||0;
+  let total=0;
+  document.querySelectorAll('.expense-row-amt').forEach(i=>{total+=parseInt(i.value)||0;});
+  const preview=document.getElementById('profitPreview');
+  const previewNum=document.getElementById('profitPreviewNum');
+  if(total>0&&revenue>0){
+    const profit=revenue-total;
+    preview.style.display='block';
+    previewNum.textContent=fmt(Math.abs(profit))+(profit<0?' (loss)':'');
+    previewNum.style.color=profit>=0?'var(--green)':'var(--red)';
+    preview.style.background=profit>=0?'var(--green-pale)':'var(--red-pale)';
+    preview.style.borderColor=profit>=0?'rgba(26,110,74,0.15)':'rgba(192,57,43,0.2)';
+  } else {
+    preview.style.display='none';
+  }
+}
+
+async function saveFinances(){
+  const btn=document.getElementById('modalSaveBtn');
+  btn.textContent='Saving...';btn.disabled=true;
+
+  const cash=parseInt(document.getElementById('inp-cash').value)||null;
+  const invoices=parseInt(document.getElementById('inp-invoices').value)||null;
+  const expenses=[];
+  document.querySelectorAll('#expenseRows .expense-row').forEach(row=>{
+    const name=row.querySelector('.expense-row-name').value.trim();
+    const amount=parseInt(row.querySelector('.expense-row-amt').value)||0;
+    if(name&&amount>0) expenses.push({name,amount});
+  });
+  const totalExp=expenses.reduce((s,e)=>s+e.amount,0);
+
+  const fin={};
+  if(cash) fin.cash_balance=cash;
+  if(invoices) fin.outstanding_invoices=invoices;
+  if(expenses.length) fin.expenses=expenses;
+  if(totalExp) fin.total_expenses=totalExp;
+
+  try{
+    await fetch(`${API}/api/profile`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({finances_manual:fin})
+    });
+    closeSetupModal();
+    // Reload dashboard to show new data
+    window.location.reload();
+  }catch(e){
+    btn.textContent='Save & update dashboard →';btn.disabled=false;
+    alert('Could not save. Please try again.');
+  }
+}
+
+loadDashboard();
+</script>
+</body>
+</html>

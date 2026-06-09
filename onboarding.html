@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Set Up Your Business — Ledger CFO</title>
+  <meta name="description" content="Tell your AI CFO about your business so it can give you the most relevant financial advice."/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#0f2d6b;--navy-light:#1a3f8f;--navy-pale:#eaeffa;
+      --charcoal:#0d1117;--gray:#5a6a7e;--gray-light:#9aaabb;
+      --border:#dde3ee;--cream:#f6f8fc;--white:#fff;
+      --green:#1a6e4a;--green-pale:#e8f5ef;
+      --shadow-md:0 4px 24px rgba(13,17,23,0.1);
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Epilogue',sans-serif;background:var(--cream);color:var(--charcoal);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+    nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;background:var(--white);border-bottom:1px solid var(--border)}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .nav-logo-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--charcoal);letter-spacing:-0.3px;line-height:1}
+    .nav-logo-tag{font-size:9px;font-weight:500;color:var(--navy);letter-spacing:3.5px;line-height:1}
+
+    .main{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px}
+
+    .card{background:var(--white);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow-md);width:100%;max-width:560px;overflow:hidden}
+
+    /* PROGRESS */
+    .progress-bar{height:3px;background:var(--border)}
+    .progress-fill{height:100%;background:var(--navy);transition:width 0.4s ease;border-radius:0 2px 2px 0}
+
+    .card-body{padding:48px}
+    .step-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--navy);margin-bottom:12px}
+    .step-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:var(--charcoal);letter-spacing:-0.5px;line-height:1.1;margin-bottom:8px}
+    .step-sub{font-size:14px;font-weight:300;color:var(--gray);line-height:1.6;margin-bottom:32px}
+
+    /* STEPS */
+    .step{display:none}
+    .step.active{display:block;animation:fadeUp 0.4s ease both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+    /* FORM */
+    .form-group{margin-bottom:20px}
+    .form-label{display:block;font-size:13px;font-weight:500;color:var(--charcoal);margin-bottom:6px}
+    .form-input{width:100%;font-family:'Epilogue',sans-serif;font-size:14px;font-weight:300;padding:12px 16px;border:1.5px solid var(--border);border-radius:10px;outline:none;background:var(--cream);color:var(--charcoal);transition:border-color 0.2s}
+    .form-input:focus{border-color:var(--navy);background:var(--white)}
+    .form-input::placeholder{color:var(--gray-light)}
+    .form-select{width:100%;font-family:'Epilogue',sans-serif;font-size:14px;padding:12px 16px;border:1.5px solid var(--border);border-radius:10px;outline:none;background:var(--cream);color:var(--charcoal);cursor:pointer}
+    .form-select:focus{border-color:var(--navy)}
+
+    /* OPTION CARDS */
+    .options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+    .option-card{border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:10px}
+    .option-card:hover{border-color:var(--navy);background:var(--navy-pale)}
+    .option-card.selected{border-color:var(--navy);background:var(--navy-pale)}
+    .option-card .icon{font-size:20px;flex-shrink:0}
+    .option-card .label{font-size:13px;font-weight:400;color:var(--charcoal)}
+    .option-card.selected .label{color:var(--navy);font-weight:500}
+
+    /* REVENUE SLIDER */
+    .slider-wrap{margin-bottom:8px}
+    .slider-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--gray-light);margin-bottom:6px}
+    input[type=range]{width:100%;accent-color:var(--navy);height:4px}
+    .slider-value{text-align:center;font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:var(--navy);letter-spacing:-1px;margin:12px 0 4px}
+    .slider-label{text-align:center;font-size:12px;color:var(--gray-light)}
+
+    /* NAVIGATION */
+    .card-footer{padding:0 48px 40px;display:flex;align-items:center;justify-content:space-between}
+    .btn-back{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:400;padding:10px 20px;background:transparent;color:var(--gray);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:background 0.2s}
+    .btn-back:hover{background:var(--cream)}
+    .btn-next{font-family:'Epilogue',sans-serif;font-size:14px;font-weight:600;padding:12px 28px;background:var(--navy);color:white;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(15,45,107,0.25)}
+    .btn-next:hover{background:var(--navy-light);transform:translateY(-1px)}
+    .btn-next:disabled{background:var(--border);color:var(--gray-light);cursor:not-allowed;transform:none;box-shadow:none}
+    .step-counter{font-size:12px;color:var(--gray-light)}
+
+    @media(max-width:600px){
+      nav{padding:0 16px}
+      .main{padding:24px 16px}
+      .card-body{padding:32px 24px}
+      .card-footer{padding:0 24px 28px}
+      .step-title{font-size:26px}
+      .options-grid{grid-template-columns:1fr 1fr;gap:8px}
+      .option-card{padding:12px}
+      .slider-value{font-size:28px}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <svg width="32" height="32" viewBox="0 0 52 52" fill="none">
+      <rect width="52" height="52" rx="11" fill="#0f2d6b"/>
+      <rect x="10" y="30" width="8" height="14" rx="2" fill="white" opacity="0.45"/>
+      <rect x="22" y="20" width="8" height="24" rx="2" fill="white" opacity="0.7"/>
+      <rect x="34" y="12" width="8" height="32" rx="2" fill="white"/>
+      <polyline points="10,26 26,16 44,8" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+      <circle cx="10" cy="26" r="2.2" fill="white" opacity="0.85"/>
+      <circle cx="26" cy="16" r="2.2" fill="white" opacity="0.85"/>
+      <circle cx="44" cy="8" r="2.2" fill="white" opacity="0.85"/>
+    </svg>
+    <div style="display:flex;flex-direction:column;gap:1px">
+      <span class="nav-logo-name">Ledger</span>
+      <span class="nav-logo-tag">CFO</span>
+    </div>
+  </a>
+  <span style="font-size:13px;color:var(--gray-light)">Setting up your business profile</span>
+</nav>
+
+<div class="main">
+  <div class="card">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:20%"></div>
+    </div>
+
+    <div class="card-body">
+
+      <!-- STEP 1: Business name -->
+      <div class="step active" id="step1">
+        <p class="step-label">Step 1 of 5</p>
+        <h2 class="step-title">What's your business called?</h2>
+        <p class="step-sub">This is how your AI CFO will refer to your business in every conversation and report.</p>
+        <div class="form-group">
+          <label class="form-label" for="bizName">Business name</label>
+          <input class="form-input" type="text" id="bizName" placeholder="e.g. Rivera Landscaping Co." oninput="checkStep1()"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="ownerName">Your first name</label>
+          <input class="form-input" type="text" id="ownerName" placeholder="e.g. James" oninput="checkStep1()"/>
+        </div>
+      </div>
+
+      <!-- STEP 2: Industry -->
+      <div class="step" id="step2">
+        <p class="step-label">Step 2 of 5</p>
+        <h2 class="step-title">What industry are you in?</h2>
+        <p class="step-sub">Your AI CFO gives more relevant advice when it understands your business type.</p>
+        <div class="options-grid">
+          <div class="option-card" onclick="selectOption(this,'industry','landscaping')">
+            <span class="icon">🌿</span><span class="label">Landscaping</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'industry','construction')">
+            <span class="icon">🔨</span><span class="label">Construction</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'industry','healthcare')">
+            <span class="icon">🏥</span><span class="label">Healthcare</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'industry','legal')">
+            <span class="icon">⚖️</span><span class="label">Legal</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'industry','marketing')">
+            <span class="icon">📱</span><span class="label">Marketing / Agency</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'industry','realestate')">
+            <span class="icon">🏠</span><span class="label">Real estate</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'industry','fitness')">
+            <span class="icon">💪</span><span class="label">Fitness / Wellness</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'industry','ecommerce')">
+            <span class="icon">🛒</span><span class="label">E-commerce</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'industry','restaurant')">
+            <span class="icon">🍽️</span><span class="label">Restaurant / Food</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'industry','tech')">
+            <span class="icon">💻</span><span class="label">Tech / SaaS</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'industry','affiliate')">
+            <span class="icon">📊</span><span class="label">Affiliate / Marketing</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'industry','other')">
+            <span class="icon">💼</span><span class="label">Other</span>
+          </div>
+          <div id="industry-other-wrap" style="display:none;grid-column:span 2;margin-top:4px">
+            <input class="form-input" type="text" id="industry-other-text" placeholder="Describe your industry..."/>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Revenue -->
+      <div class="step" id="step3">
+        <p class="step-label">Step 3 of 5</p>
+        <h2 class="step-title">What's your monthly revenue?</h2>
+        <p class="step-sub">An estimate is fine. This helps your CFO calibrate advice to your actual scale.</p>
+        <div class="slider-wrap">
+          <div class="slider-value" id="revenueDisplay">$25,000</div>
+          <div class="slider-label">estimated monthly revenue</div>
+          <div style="margin:16px 0">
+            <div class="slider-labels"><span>$5k</span><span>$50k</span><span>$250k+</span></div>
+            <input type="range" id="revenueSlider" min="5000" max="250000" step="5000" value="25000" oninput="updateRevenue(this.value)"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: Employees -->
+      <div class="step" id="step4">
+        <p class="step-label">Step 4 of 5</p>
+        <h2 class="step-title">How many people work for you?</h2>
+        <p class="step-sub">Including contractors, part-time staff, and yourself.</p>
+        <div class="options-grid">
+          <div class="option-card" onclick="selectOption(this,'employees','just-me')">
+            <span class="icon">👤</span><span class="label">Just me</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'employees','2-5')">
+            <span class="icon">👥</span><span class="label">2–5 people</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'employees','6-15')">
+            <span class="icon">🏢</span><span class="label">6–15 people</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'employees','16-50')">
+            <span class="icon">🏗️</span><span class="label">16–50 people</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: Goal -->
+      <div class="step" id="step5">
+        <p class="step-label">Step 5 of 5</p>
+        <h2 class="step-title">What's your biggest financial challenge?</h2>
+        <p class="step-sub">Your CFO will prioritize this in every conversation and proactively watch for it.</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="option-card" style="grid-column:span 2" onclick="selectOption(this,'goal','cashflow')">
+            <span class="icon">💸</span><span class="label">Understanding and managing cash flow</span>
+          </div>
+          <div class="option-card" style="grid-column:span 2" onclick="selectOption(this,'goal','growth')">
+            <span class="icon">📈</span><span class="label">Growing revenue and hitting my goals</span>
+          </div>
+          <div class="option-card" style="grid-column:span 2" onclick="selectOption(this,'goal','expenses')">
+            <span class="icon">✂️</span><span class="label">Cutting costs and improving margins</span>
+          </div>
+          <div class="option-card" style="grid-column:span 2" onclick="selectOption(this,'goal','hiring')">
+            <span class="icon">👥</span><span class="label">Knowing when and how to hire</span>
+          </div>
+          <div class="option-card" style="grid-column:span 2" id="goal-other-card" onclick="selectOption(this,'goal','other');document.getElementById('goal-other-wrap').style.display='block'">
+            <span class="icon">💬</span><span class="label">Something else</span>
+          </div>
+          <div id="goal-other-wrap" style="display:none;grid-column:span 2;margin-top:4px">
+            <input class="form-input" type="text" id="goal-other-text" placeholder="Briefly describe your biggest financial challenge..." oninput="localStorage.setItem('lcfo_goal_custom',this.value)"/>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card-footer">
+      <button class="btn-back" id="backBtn" onclick="goBack()" style="visibility:hidden">← Back</button>
+      <span class="step-counter" id="stepCounter">1 of 5</span>
+      <button class="btn-next" id="nextBtn" onclick="goNext()" disabled>Continue →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentStep = 1;
+const totalSteps = 5;
+const selections = { industry: null, employees: null, goal: null };
+
+function checkStep1() {
+  const name = document.getElementById('bizName').value.trim();
+  const owner = document.getElementById('ownerName').value.trim();
+  document.getElementById('nextBtn').disabled = !(name && owner);
+}
+
+function selectOption(el, type, value) {
+  const parent = el.closest('.step');
+  parent.querySelectorAll(`.option-card[onclick*="${type}"]`).forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selections[type] = value;
+  document.getElementById('nextBtn').disabled = false;
+  // Show other text input if needed
+  if(type === 'industry'){
+    const wrap = document.getElementById('industry-other-wrap');
+    if(wrap) wrap.style.display = value === 'other' ? 'block' : 'none';
+  }
+}
+
+function updateRevenue(val) {
+  const num = parseInt(val);
+  const display = num >= 250000 ? '$250,000+' : '$' + num.toLocaleString();
+  document.getElementById('revenueDisplay').textContent = display;
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function goNext() {
+  if (currentStep === totalSteps) {
+    saveAndContinue();
+    return;
+  }
+  document.getElementById(`step${currentStep}`).classList.remove('active');
+  currentStep++;
+  document.getElementById(`step${currentStep}`).classList.add('active');
+  updateUI();
+}
+
+function goBack() {
+  if (currentStep === 1) return;
+  document.getElementById(`step${currentStep}`).classList.remove('active');
+  currentStep--;
+  document.getElementById(`step${currentStep}`).classList.add('active');
+  updateUI();
+}
+
+function updateUI() {
+  const pct = (currentStep / totalSteps) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('stepCounter').textContent = `${currentStep} of ${totalSteps}`;
+  document.getElementById('backBtn').style.visibility = currentStep > 1 ? 'visible' : 'hidden';
+  document.getElementById('nextBtn').textContent = currentStep === totalSteps ? 'Go to my dashboard →' : 'Continue →';
+
+  // Reset next button state per step
+  if (currentStep === 1) {
+    checkStep1();
+  } else if (currentStep === 3) {
+    document.getElementById('nextBtn').disabled = false;
+  } else {
+    document.getElementById('nextBtn').disabled = !selections[['','industry','','employees','goal'][currentStep]];
+  }
+}
+
+async function saveAndContinue() {
+  const btn = document.getElementById('nextBtn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+
+  const bizName = document.getElementById('bizName').value.trim();
+  const ownerName = document.getElementById('ownerName').value.trim();
+  const revenue = document.getElementById('revenueSlider').value;
+
+  localStorage.setItem('lcfo_business', bizName);
+  localStorage.setItem('lcfo_owner', ownerName);
+  localStorage.setItem('lcfo_revenue', revenue);
+  localStorage.setItem('lcfo_industry', selections.industry);
+  localStorage.setItem('lcfo_employees', selections.employees);
+  localStorage.setItem('lcfo_goal', selections.goal);
+
+  // Save to Supabase if logged in
+  const token = localStorage.getItem('lcfo_token');
+  if(token){
+    try{
+      await fetch('https://ledger-cfo-backend-production.up.railway.app/api/profile',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+        body:JSON.stringify({
+          business_name:bizName,
+          owner_name:ownerName,
+          monthly_revenue:parseInt(revenue),
+          industry:selections.industry,
+          employees:selections.employees,
+          goal:selections.goal
+        })
+      });
+    }catch(e){console.log('Profile save error',e);}
+  }
+
+  window.location.href = 'plans.html';
+}
+
+// Revenue slider starts enabled
+document.getElementById('nextBtn').disabled = true;
+</script>
+</body>
+</html>

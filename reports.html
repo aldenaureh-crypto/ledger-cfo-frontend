@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reports — Ledger CFO</title>
+  <meta name="description" content="AI-generated monthly financial reports for your small business. Profit & loss, cash flow, and executive summaries."/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#0f2d6b;--navy-light:#1a3f8f;--navy-pale:#eaeffa;
+      --charcoal:#0d1117;--gray:#5a6a7e;--gray-light:#9aaabb;
+      --border:#dde3ee;--cream:#f6f8fc;--white:#fff;
+      --green:#1a6e4a;--green-pale:#e8f5ef;
+      --amber:#b8730a;--amber-pale:#fef3e2;
+      --red:#c0392b;--red-pale:#fdecea;
+      --shadow-sm:0 1px 4px rgba(13,17,23,0.06);
+      --shadow-md:0 4px 20px rgba(13,17,23,0.08);
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Epilogue',sans-serif;background:var(--cream);color:var(--charcoal);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+    /* TOPBAR */
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:var(--white);border-bottom:1px solid var(--border);flex-shrink:0;position:sticky;top:0;z-index:50}
+    .topbar-left{display:flex;align-items:center;gap:32px}
+    .nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+    .nav-logo-name{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:700;color:var(--charcoal);letter-spacing:-0.3px;line-height:1}
+    .nav-logo-tag{font-size:9px;font-weight:500;color:var(--navy);letter-spacing:3px;line-height:1}
+    .topbar-nav{display:flex;align-items:center;gap:4px}
+    .topbar-nav a{font-size:13px;font-weight:400;color:var(--gray);text-decoration:none;padding:6px 12px;border-radius:8px;transition:background 0.15s,color 0.15s;display:flex;align-items:center;gap:6px}
+    .topbar-nav a:hover{background:var(--cream);color:var(--charcoal)}
+    .topbar-nav a.active{background:var(--navy-pale);color:var(--navy);font-weight:500}
+    .topbar-right{display:flex;align-items:center;gap:12px}
+    .topbar-plan{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:var(--navy-pale);color:var(--navy);padding:4px 10px;border-radius:100px}
+    .topbar-avatar{width:32px;height:32px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:white;cursor:pointer;font-family:'Cormorant Garamond',serif}
+
+    /* MAIN */
+    .main{flex:1;padding:40px 32px;max-width:1100px;margin:0 auto;width:100%}
+
+    /* PAGE HEADER */
+    .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px}
+    .page-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:var(--charcoal);letter-spacing:-0.5px;line-height:1.1}
+    .page-sub{font-size:14px;color:var(--gray);font-weight:300;margin-top:4px}
+    .btn-primary{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:500;padding:9px 18px;background:var(--navy);color:white;border:none;border-radius:8px;cursor:pointer;transition:background 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+    .btn-primary:hover{background:var(--navy-light)}
+
+    /* UPGRADE BANNER */
+    .upgrade-banner{background:var(--navy);border-radius:14px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px}
+    .upgrade-banner.hidden{display:none}
+    /* UPGRADE GATE */
+    .upgrade-gate{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(246,248,252,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+    .upgrade-gate-card{background:var(--white);border:1px solid var(--border);border-radius:24px;box-shadow:0 8px 48px rgba(13,17,23,0.14);max-width:480px;width:100%;padding:48px 44px;text-align:center;animation:fadeUp 0.5s ease both}
+    .upgrade-gate-icon{width:64px;height:64px;background:var(--navy-pale);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:28px}
+    .upgrade-gate-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--navy);margin-bottom:10px}
+    .upgrade-gate-title{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;color:var(--charcoal);letter-spacing:-0.5px;line-height:1.1;margin-bottom:12px}
+    .upgrade-gate-sub{font-size:14px;font-weight:300;color:var(--gray);line-height:1.7;margin-bottom:32px}
+    .upgrade-gate-features{display:flex;flex-direction:column;gap:10px;margin-bottom:32px;text-align:left}
+    .upgrade-gate-feature{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--charcoal);font-weight:300}
+    .upgrade-gate-feature-dot{width:6px;height:6px;border-radius:50%;background:var(--navy);flex-shrink:0}
+    .upgrade-gate-btn{display:inline-block;width:100%;font-family:'Epilogue',sans-serif;font-size:15px;font-weight:600;padding:15px;background:var(--navy);color:white;border:none;border-radius:10px;cursor:pointer;text-decoration:none;transition:background 0.2s;box-shadow:0 4px 16px rgba(15,45,107,0.25);margin-bottom:14px}
+    .upgrade-gate-btn:hover{background:var(--navy-light)}
+    .upgrade-gate-skip{font-size:13px;color:var(--gray-light);cursor:pointer;text-decoration:underline;background:none;border:none;font-family:'Epilogue',sans-serif}
+    .upgrade-gate-skip:hover{color:var(--gray)}
+    .upgrade-text h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:white;margin-bottom:4px}
+    .upgrade-text p{font-size:13px;color:rgba(255,255,255,0.6);font-weight:300;max-width:480px;line-height:1.6}
+    .upgrade-btn{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:600;padding:10px 22px;background:white;color:var(--navy);border:none;border-radius:8px;cursor:pointer;white-space:nowrap;text-decoration:none}
+    .upgrade-btn:hover{opacity:0.9}
+
+    /* REPORT LIST */
+    .reports-grid{display:flex;flex-direction:column;gap:16px}
+    .report-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px 28px;display:flex;align-items:center;gap:24px;transition:box-shadow 0.2s,transform 0.2s;cursor:pointer;text-decoration:none}
+    .report-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+    .report-card.locked{cursor:default;opacity:0.6}
+    .report-card.locked:hover{box-shadow:none;transform:none}
+    .report-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px}
+    .report-icon.green{background:var(--green-pale);color:var(--green)}
+    .report-icon.navy{background:var(--navy-pale);color:var(--navy)}
+    .report-icon.amber{background:var(--amber-pale);color:var(--amber)}
+    .report-meta{flex:1}
+    .report-title{font-size:16px;font-weight:500;color:var(--charcoal);margin-bottom:4px;display:flex;align-items:center;gap:10px}
+    .report-sub{font-size:13px;color:var(--gray);font-weight:300;line-height:1.5}
+    .report-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px}
+    .report-badge.new{background:var(--green-pale);color:var(--green)}
+    .report-badge.ready{background:var(--navy-pale);color:var(--navy)}
+    .report-badge.lock{background:var(--cream);color:var(--gray-light);border:1px solid var(--border)}
+    .report-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
+    .report-date{font-size:12px;color:var(--gray-light);font-weight:300}
+    .report-action{font-size:13px;font-weight:500;color:var(--navy);display:flex;align-items:center;gap:4px}
+    .report-action.locked{color:var(--gray-light)}
+
+    /* REPORT PREVIEW MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(13,17,23,0.5);z-index:100;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity 0.2s}
+    .modal-overlay.show{opacity:1;pointer-events:all}
+    .modal{background:var(--white);border-radius:20px;width:100%;max-width:720px;max-height:88vh;overflow-y:auto;animation:modalIn 0.25s ease both}
+    @keyframes modalIn{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .modal-header{display:flex;align-items:center;justify-content:space-between;padding:24px 32px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--white);z-index:1}
+    .modal-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--charcoal)}
+    .modal-close{width:32px;height:32px;background:var(--cream);border:1px solid var(--border);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--gray);transition:background 0.15s}
+    .modal-close:hover{background:var(--border)}
+    .modal-body{padding:32px}
+    .report-section{margin-bottom:28px}
+    .report-section-title{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--navy);margin-bottom:12px}
+    .report-summary{font-size:15px;font-weight:300;color:var(--charcoal);line-height:1.8;margin-bottom:16px}
+    .report-summary strong{font-weight:600}
+    .report-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+    .rstat{background:var(--cream);border-radius:10px;padding:14px 16px}
+    .rstat-label{font-size:11px;color:var(--gray-light);font-weight:500;letter-spacing:0.5px;margin-bottom:4px}
+    .rstat-value{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--charcoal);letter-spacing:-0.5px}
+    .rstat-change{font-size:11px;font-weight:500;margin-top:2px}
+    .rstat-change.up{color:var(--green)}
+    .rstat-change.down{color:var(--red)}
+    .insight-list{display:flex;flex-direction:column;gap:10px}
+    .insight-item{display:flex;gap:12px;padding:12px 16px;border-radius:10px;border:1px solid var(--border)}
+    .insight-item.positive{background:var(--green-pale);border-color:rgba(26,110,74,0.15)}
+    .insight-item.warning{background:var(--amber-pale);border-color:rgba(184,115,10,0.15)}
+    .insight-item.action{background:var(--navy-pale);border-color:rgba(15,45,107,0.12)}
+    .insight-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+    .insight-item.positive .insight-dot{background:var(--green)}
+    .insight-item.warning .insight-dot{background:var(--amber)}
+    .insight-item.action .insight-dot{background:var(--navy)}
+    .insight-text{font-size:13px;font-weight:300;color:var(--charcoal);line-height:1.6}
+    .insight-text strong{font-weight:500}
+    .modal-footer{padding:20px 32px;border-top:1px solid var(--border);display:flex;gap:12px;justify-content:flex-end}
+    .btn-outline{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:400;padding:9px 18px;background:transparent;color:var(--navy);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:background 0.2s;display:inline-flex;align-items:center;gap:6px}
+    .btn-outline:hover{background:var(--navy-pale)}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .fade1{animation:fadeUp 0.5s 0.05s ease both}
+    .fade2{animation:fadeUp 0.5s 0.1s ease both}
+
+    @media(max-width:700px){
+      .topbar{padding:0 16px;height:56px}
+      .topbar-nav a span{display:none}
+      .topbar-nav a{padding:6px 8px}
+      .main{padding:20px 16px}
+      .reports-grid{grid-template-columns:1fr}
+      .upgrade-gate-card{padding:32px 20px}
+      .upgrade-gate-title{font-size:26px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a class="nav-logo" href="index.html">
+      <svg width="28" height="28" viewBox="0 0 52 52" fill="none">
+        <rect width="52" height="52" rx="11" fill="#0f2d6b"/>
+        <rect x="10" y="30" width="8" height="14" rx="2" fill="white" opacity="0.45"/>
+        <rect x="22" y="20" width="8" height="24" rx="2" fill="white" opacity="0.7"/>
+        <rect x="34" y="12" width="8" height="32" rx="2" fill="white"/>
+        <polyline points="10,26 26,16 44,8" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+        <circle cx="10" cy="26" r="2.2" fill="white" opacity="0.85"/>
+        <circle cx="26" cy="16" r="2.2" fill="white" opacity="0.85"/>
+        <circle cx="44" cy="8" r="2.2" fill="white" opacity="0.85"/>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:1px">
+        <span class="nav-logo-name">Ledger</span>
+        <span class="nav-logo-tag">CFO</span>
+      </div>
+    </a>
+    <nav class="topbar-nav">
+      <a href="dashboard.html"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> <span>Dashboard</span></a>
+      <a href="chat.html"><i class="ti ti-message" aria-hidden="true"></i> <span>Ask CFO</span></a>
+      <a href="reports.html" class="active"><i class="ti ti-file-analytics" aria-hidden="true"></i> <span>Reports</span></a>
+      <a href="settings.html"><i class="ti ti-settings" aria-hidden="true"></i> <span>Settings</span></a>
+    </nav>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-plan" id="planBadge">Pro</span>
+    <div class="topbar-avatar" id="avatarEl">R</div>
+  </div>
+</div>
+
+<!-- UPGRADE GATE (shown for starter + pro plans — reports are Scale only) -->
+<div class="upgrade-gate" id="upgradeGate" style="display:none">
+  <div class="upgrade-gate-card">
+    <div class="upgrade-gate-icon">📈</div>
+    <p class="upgrade-gate-label">Scale Feature</p>
+    <h2 class="upgrade-gate-title">Upgrade to unlock reports.</h2>
+    <p class="upgrade-gate-sub">Monthly AI-generated financial reports are available on the Scale plan. Every month your CFO writes a full summary of your business — what happened, why, and what to do next.</p>
+    <div class="upgrade-gate-features">
+      <div class="upgrade-gate-feature"><div class="upgrade-gate-feature-dot"></div>Monthly AI-written financial summaries</div>
+      <div class="upgrade-gate-feature"><div class="upgrade-gate-feature-dot"></div>Profit & loss breakdowns</div>
+      <div class="upgrade-gate-feature"><div class="upgrade-gate-feature-dot"></div>Cash flow forecasting</div>
+      <div class="upgrade-gate-feature"><div class="upgrade-gate-feature-dot"></div>Downloadable PDF reports</div>
+    </div>
+    <a href="plans.html?upgrade=true" class="upgrade-gate-btn">Upgrade to Pro →</a><br>
+    <button class="upgrade-gate-skip" onclick="window.location.href='chat.html'">Go back to chat</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="page-header fade1">
+    <div>
+      <h1 class="page-title">Financial Reports</h1>
+      <p class="page-sub">AI-generated monthly summaries of your business finances.</p>
+    </div>
+    <button class="btn-primary" onclick="openReport('may')">
+      <i class="ti ti-download" aria-hidden="true"></i> Download latest
+    </button>
+  </div>
+
+  <!-- UPGRADE BANNER — shown for starter users -->
+  <div class="upgrade-banner hidden" id="upgradeBanner">
+    <div class="upgrade-text">
+      <h3>Reports are a Pro feature.</h3>
+      <p>Upgrade to Pro to get monthly AI-generated financial reports delivered automatically — summarizing your revenue, expenses, profit, and what to do next.</p>
+    </div>
+    <a href="plans.html" class="upgrade-btn">Upgrade to Pro →</a>
+  </div>
+
+  <!-- REPORTS EMPTY STATE — shown until first report is generated -->
+  <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:64px 32px;text-align:center;margin-top:8px">
+    <div style="width:64px;height:64px;background:var(--navy-pale);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px">📋</div>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--charcoal);margin-bottom:10px;letter-spacing:-0.3px">Your first report is on its way.</h2>
+    <p style="font-size:14px;color:var(--gray);font-weight:300;line-height:1.7;max-width:420px;margin:0 auto 28px">Monthly AI-generated reports will appear here automatically. Connect your accounts and your CFO will write your first summary at the end of this month.</p>
+    <a href="settings.html" style="display:inline-flex;align-items:center;gap:8px;font-family:'Epilogue',sans-serif;font-size:14px;font-weight:600;padding:13px 28px;background:var(--navy);color:white;border-radius:10px;text-decoration:none;transition:background 0.2s">
+      Connect accounts to get started →
+    </a>
+    <p style="font-size:12px;color:var(--gray-light);margin-top:16px;font-weight:300">Reports generate on the 1st of each month once your accounts are connected.</p>
+  </div>
+</div>
+
+<!-- REPORT MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle">May 2026 — Monthly Report</h2>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close report">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeModal()">Close</button>
+      <button class="btn-primary" onclick="closeModal()">
+        <i class="ti ti-download" aria-hidden="true"></i> Download PDF
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API='https://ledger-cfo-backend-production.up.railway.app';
+if(!localStorage.getItem('lcfo_token')){window.location.href='login.html';}
+
+const biz=localStorage.getItem('lcfo_business')||'Your Business';
+const plan=localStorage.getItem('lcfo_plan')||'starter';
+document.getElementById('planBadge').textContent=plan.charAt(0).toUpperCase()+plan.slice(1);
+document.getElementById('avatarEl').textContent=biz.charAt(0).toUpperCase();
+if(plan!=='scale'){
+  document.getElementById('upgradeGate').style.display='flex';
+}
+
+// Load real profile to update display name and check plan
+async function loadProfile(){
+  try{
+    const res=await fetch(`${API}/api/profile`,{headers:{'Authorization':'Bearer '+localStorage.getItem('lcfo_token')}});
+    if(!res.ok) return;
+    const p=await res.json();
+    if(p.business_name){
+      document.getElementById('avatarEl').textContent=p.business_name.charAt(0).toUpperCase();
+      localStorage.setItem('lcfo_business',p.business_name);
+    }
+    const realPlan=p.plan||'starter';
+    localStorage.setItem('lcfo_plan',realPlan);
+    document.getElementById('planBadge').textContent=realPlan.charAt(0).toUpperCase()+realPlan.slice(1);
+    if(realPlan!=='scale'){
+      document.getElementById('upgradeGate').style.display='flex';
+    } else {
+      document.getElementById('upgradeGate').style.display='none';
+    }
+  }catch(e){}
+}
+loadProfile();
+
+function openReport(key){
+  document.getElementById('modalTitle').textContent='Report coming soon';
+  document.getElementById('modalBody').innerHTML=`
+    <div style="text-align:center;padding:40px 20px">
+      <div style="font-size:48px;margin-bottom:16px">📊</div>
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;margin-bottom:12px">AI reports are on the way</h3>
+      <p style="font-size:14px;color:#5a6a7e;font-weight:300;line-height:1.7;max-width:360px;margin:0 auto">Monthly AI-generated financial reports will appear here once you connect your accounts. Each report will include an executive summary, AI insights, expense breakdown, and next month outlook — all personalized to your business.</p>
+      <a href="settings.html" style="display:inline-block;margin-top:24px;padding:12px 28px;background:#0f2d6b;color:white;border-radius:8px;text-decoration:none;font-size:14px;font-weight:500">Connect accounts →</a>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('show');
+  document.body.style.overflow='';
+}
+
+function handleOverlayClick(e){
+  if(e.target===document.getElementById('modalOverlay'))closeModal();
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+</script>
+</body>
+</html>

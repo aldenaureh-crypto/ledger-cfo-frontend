@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Choose Your Plan — Ledger CFO</title>
+  <meta name="description" content="Choose the right Ledger CFO plan for your business. All plans include a 7-day free trial."/>
+  <meta property="og:title" content="Choose Your Plan — Ledger CFO"/>
+  <meta property="og:description" content="AI-powered CFO for small businesses. Starter, Pro, and Scale plans available."/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#0f2d6b;--navy-light:#1a3f8f;--navy-pale:#eaeffa;
+      --charcoal:#0d1117;--gray:#5a6a7e;--gray-light:#9aaabb;
+      --border:#dde3ee;--cream:#f6f8fc;--white:#fff;
+      --green:#1a6e4a;--green-pale:#e8f5ef;
+      --shadow-sm:0 1px 4px rgba(13,17,23,0.06);
+      --shadow-md:0 4px 24px rgba(13,17,23,0.1);
+      --shadow-lg:0 16px 60px rgba(13,17,23,0.13);
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Epilogue',sans-serif;background:var(--cream);color:var(--charcoal);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+    nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;background:var(--white);border-bottom:1px solid var(--border)}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .nav-logo-icon{width:32px;height:32px;flex-shrink:0}
+    .nav-logo-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--charcoal);letter-spacing:-0.3px;line-height:1}
+    .nav-logo-tag{font-size:9px;font-weight:500;color:var(--navy);letter-spacing:3.5px;line-height:1}
+    .nav-step{font-size:13px;color:var(--gray-light)}
+    .nav-step span{color:var(--navy);font-weight:500}
+
+    .main{flex:1;padding:60px 24px;display:flex;flex-direction:column;align-items:center}
+
+    .header{text-align:center;margin-bottom:48px;animation:fadeUp 0.5s ease both}
+    .header-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--navy);margin-bottom:12px}
+    .header-title{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:700;color:var(--charcoal);letter-spacing:-0.8px;line-height:1.1;margin-bottom:12px}
+    .header-name{color:var(--navy);font-style:italic}
+    .header-sub{font-size:16px;font-weight:300;color:var(--gray);line-height:1.6}
+
+    .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:1000px;width:100%;margin-bottom:40px}
+
+    .plan{background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:36px 32px;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;position:relative;animation:fadeUp 0.5s ease both}
+    .plan:nth-child(2){animation-delay:0.1s}
+    .plan:nth-child(3){animation-delay:0.2s}
+    .plan:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+    .plan.selected{border-color:var(--navy);box-shadow:0 0 0 4px rgba(15,45,107,0.1)}
+    .plan.featured{border-color:var(--navy)}
+
+    .plan-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;font-size:11px;font-weight:600;padding:4px 16px;border-radius:100px;white-space:nowrap;letter-spacing:0.5px}
+
+    .plan-tier{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:16px}
+    .plan-price{font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:700;color:var(--charcoal);letter-spacing:-2px;line-height:1;margin-bottom:4px}
+    .plan-price sup{font-size:24px;vertical-align:super;letter-spacing:0}
+    .plan-period{font-size:13px;color:var(--gray);margin-bottom:8px}
+    .plan-trial{font-size:12px;color:var(--green);font-weight:500;margin-bottom:24px;display:flex;align-items:center;gap:5px}
+    .plan-divider{height:1px;background:var(--border);margin-bottom:24px}
+
+    .plan-features{list-style:none;display:flex;flex-direction:column;gap:11px;margin-bottom:32px}
+    .plan-features li{display:flex;align-items:flex-start;gap:10px;font-size:14px;font-weight:300;color:var(--charcoal);line-height:1.4}
+    .plan-features li::before{content:'✓';color:var(--navy);font-weight:700;flex-shrink:0;font-size:13px;margin-top:1px}
+    .plan-features li.muted{color:var(--gray-light)}
+    .plan-features li.muted::before{content:'–';color:var(--border);font-weight:400}
+
+    .plan-select{width:100%;font-family:'Epilogue',sans-serif;font-size:14px;font-weight:600;padding:13px;border-radius:10px;cursor:pointer;transition:all 0.2s;border:1.5px solid var(--navy)}
+    .plan-select.outline{background:transparent;color:var(--navy)}
+    .plan-select.outline:hover{background:var(--navy-pale)}
+    .plan-select.fill{background:var(--navy);color:white;box-shadow:0 4px 16px rgba(15,45,107,0.25)}
+    .plan-select.fill:hover{background:var(--navy-light);transform:translateY(-1px)}
+
+    .selected-indicator{display:none;position:absolute;top:16px;right:16px;width:24px;height:24px;background:var(--navy);border-radius:50%;align-items:center;justify-content:center}
+    .plan.selected .selected-indicator{display:flex}
+
+    .continue-wrap{text-align:center;animation:fadeUp 0.5s 0.3s ease both;opacity:0;animation-fill-mode:both}
+    .continue-btn{font-family:'Epilogue',sans-serif;font-size:15px;font-weight:600;padding:15px 48px;background:var(--navy);color:white;border:none;border-radius:10px;cursor:pointer;box-shadow:0 4px 20px rgba(15,45,107,0.3);transition:all 0.2s;display:inline-flex;align-items:center;gap:8px}
+    .continue-btn:hover{background:var(--navy-light);transform:translateY(-1px)}
+    .continue-btn:disabled{background:var(--border);color:var(--gray-light);cursor:not-allowed;transform:none;box-shadow:none}
+    .continue-note{font-size:13px;color:var(--gray-light);margin-top:12px;font-weight:300}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+    footer{padding:24px;text-align:center;font-size:13px;color:var(--gray-light);border-top:1px solid var(--border);background:var(--white)}
+
+    @media(max-width:720px){
+      nav{padding:0 20px}
+      .main{padding:32px 16px}
+      .header-title{font-size:34px}
+      .plans{grid-template-columns:1fr;max-width:420px}
+      .continue-btn{padding:15px 32px;font-size:14px}
+      footer{padding:20px 16px}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <svg class="nav-logo-icon" viewBox="0 0 52 52" fill="none">
+      <rect width="52" height="52" rx="11" fill="#0f2d6b"/>
+      <rect x="10" y="30" width="8" height="14" rx="2" fill="white" opacity="0.45"/>
+      <rect x="22" y="20" width="8" height="24" rx="2" fill="white" opacity="0.7"/>
+      <rect x="34" y="12" width="8" height="32" rx="2" fill="white"/>
+      <polyline points="10,26 26,16 44,8" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+      <circle cx="10" cy="26" r="2.2" fill="white" opacity="0.85"/>
+      <circle cx="26" cy="16" r="2.2" fill="white" opacity="0.85"/>
+      <circle cx="44" cy="8" r="2.2" fill="white" opacity="0.85"/>
+    </svg>
+    <div style="display:flex;flex-direction:column;gap:1px">
+      <span class="nav-logo-name">Ledger</span>
+      <span class="nav-logo-tag">CFO</span>
+    </div>
+  </a>
+  <div class="nav-step">Step <span>2 of 2</span> — Choose your plan</div>
+</nav>
+
+<div class="main">
+  <div class="header">
+    <p class="header-label">Almost there</p>
+    <h1 class="header-title">Choose the right plan<br>for <span class="header-name" id="businessDisplay">your business</span>.</h1>
+    <p class="header-sub">All plans include a 7-day free trial. Upgrade or cancel anytime.</p>
+  </div>
+
+  <div class="plans">
+
+    <!-- STARTER -->
+    <div class="plan" id="plan-starter" onclick="selectPlan('starter')">
+      <div class="selected-indicator">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <p class="plan-tier">Starter</p>
+      <p class="plan-price"><sup>$</sup>49</p>
+      <p class="plan-period">per month</p>
+      <p class="plan-trial">✓ 7-day free trial included</p>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>AI financial chat assistant</li>
+        <li>Upload bank statements & P&L</li>
+        <li>Cash flow analysis</li>
+        <li>Financial health score (0–100)</li>
+        <li>Up to 50 questions/month</li>
+        <li>Email support</li>
+        <li class="muted">Full financial dashboard</li>
+        <li class="muted">Live integrations</li>
+      </ul>
+      <button class="plan-select outline" onclick="selectPlan('starter')">Select Starter</button>
+    </div>
+
+    <!-- PRO -->
+    <div class="plan featured" id="plan-pro" onclick="selectPlan('pro')">
+      <div class="plan-badge">Most Popular</div>
+      <div class="selected-indicator">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <p class="plan-tier">Pro</p>
+      <p class="plan-price"><sup>$</sup>99</p>
+      <p class="plan-period">per month</p>
+      <p class="plan-trial">✓ 7-day free trial included</p>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>Everything in Starter</li>
+        <li>Full financial dashboard</li>
+        <li>QuickBooks & Stripe integration</li>
+        <li>Proactive weekly AI alerts</li>
+        <li>90-day cash flow forecasting</li>
+        <li>Unlimited questions</li>
+        <li>Priority support</li>
+        <li class="muted">Monthly AI reports</li>
+      </ul>
+      <button class="plan-select fill" onclick="selectPlan('pro')">Select Pro</button>
+    </div>
+
+    <!-- SCALE -->
+    <div class="plan" id="plan-scale" onclick="selectPlan('scale')">
+      <div class="selected-indicator">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <p class="plan-tier">Scale</p>
+      <p class="plan-price"><sup>$</sup>199</p>
+      <p class="plan-period">per month</p>
+      <p class="plan-trial">✓ 7-day free trial included</p>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>Everything in Pro</li>
+        <li>Monthly AI-generated reports</li>
+        <li>Scenario modeling & forecasting</li>
+        <li>Goal tracking & alerts</li>
+        <li>Multi-user access</li>
+        <li>Dedicated onboarding call</li>
+      </ul>
+      <button class="plan-select outline" onclick="selectPlan('scale')">Select Scale</button>
+    </div>
+
+  </div>
+
+  <div class="continue-wrap">
+    <button class="continue-btn" id="continueBtn" onclick="handleContinue()" disabled>
+      Continue to Dashboard
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+    <p class="continue-note">You won't be charged until your trial ends</p>
+  </div>
+</div>
+
+<footer>© 2026 Ledger CFO · <a href="terms.html" style="color:var(--gray-light)">Terms</a> · <a href="privacy.html" style="color:var(--gray-light)">Privacy</a></footer>
+
+<script>
+const API='https://ledger-cfo-backend-production.up.railway.app';
+let selectedPlan=null;
+const isUpgrade=new URLSearchParams(window.location.search).get('upgrade')==='true';
+
+// Show business name if available
+const bizName=localStorage.getItem('lcfo_business');
+if(bizName)document.getElementById('businessDisplay').textContent=bizName;
+
+// If upgrading, adjust heading, pre-select current plan, and update button text
+if(isUpgrade){
+  const sub=document.querySelector('.header-sub');
+  if(sub)sub.textContent='Select your new plan. Changes take effect immediately.';
+  const note=document.querySelector('.continue-note');
+  if(note)note.textContent='You can change or cancel your plan at any time.';
+  // Pre-select current plan
+  const currentPlan=localStorage.getItem('lcfo_plan')||'starter';
+  selectPlan(currentPlan);
+  // Update continue button label
+  document.getElementById('continueBtn').innerHTML='Save Plan &amp; Return to Dashboard <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+}
+
+function selectPlan(plan){
+  selectedPlan=plan;
+  ['starter','pro','scale'].forEach(p=>{
+    const el=document.getElementById('plan-'+p);
+    el.classList.toggle('selected',p===plan);
+    const btn=el.querySelector('.plan-select');
+    if(p===plan){btn.classList.remove('outline');btn.classList.add('fill');}
+    else{btn.classList.remove('fill');btn.classList.add('outline');}
+  });
+  const cont=document.getElementById('continueBtn');
+  cont.disabled=false;cont.style.opacity='1';
+}
+
+async function handleContinue(){
+  if(!selectedPlan)return;
+  const btn=document.getElementById('continueBtn');
+  btn.textContent='Loading...';btn.disabled=true;
+
+  const token=localStorage.getItem('lcfo_token');
+
+  // If not logged in yet (new signup flow), just save locally and continue to onboarding
+  if(!token){
+    localStorage.setItem('lcfo_plan',selectedPlan);
+    window.location.href='onboarding.html';
+    return;
+  }
+
+  // If upgrading from existing account, go to Stripe checkout
+  try{
+    const res=await fetch(`${API}/api/stripe/checkout`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({plan:selectedPlan})
+    });
+    const data=await res.json();
+    if(data.url){
+      window.location.href=data.url; // redirect to Stripe-hosted checkout
+    } else {
+      btn.textContent='Error — try again';btn.disabled=false;
+    }
+  }catch(e){
+    console.error('Checkout error',e);
+    btn.textContent='Error — try again';btn.disabled=false;
+  }
+}
+</script>
+</body>
+</html>
