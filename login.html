@@ -242,6 +242,7 @@ async function handleLogin(){
     if(!res.ok)throw new Error(data.error||'Login failed');
     localStorage.setItem('lcfo_token',data.session.access_token);
     localStorage.setItem('lcfo_user_id',data.user.id);
+    localStorage.setItem('lcfo_email',data.user.email);
     window.location.href='dashboard.html';
   }catch(err){
     errorBanner.querySelector?errorBanner.textContent=err.message:null;

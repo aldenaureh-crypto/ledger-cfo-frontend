@@ -171,8 +171,8 @@
     </nav>
   </div>
   <div class="topbar-right">
-    <span class="topbar-plan" id="planBadge">Pro</span>
-    <div class="topbar-avatar" id="avatarEl">R</div>
+    <span class="topbar-plan" id="planBadge">...</span>
+    <div class="topbar-avatar" id="avatarEl">...</div>
   </div>
 </div>
 
@@ -253,7 +253,7 @@
               <div class="card-row-sub">For account notifications and reports</div>
             </div>
             <div class="card-row-right">
-              <input class="form-input" type="email" id="emailInput" value="owner@riveralandscaping.com"/>
+              <input class="form-input" type="email" id="emailInput" value="" placeholder="Loading..."/>
             </div>
           </div>
           <div class="card-row">
@@ -665,10 +665,9 @@ const API='https://ledger-cfo-backend-production.up.railway.app';
 const token=localStorage.getItem('lcfo_token');
 if(!token){window.location.href='login.html';}
 
-const biz=localStorage.getItem('lcfo_business')||'Your Business';
+const biz=localStorage.getItem('lcfo_business')||'';
 const plan=localStorage.getItem('lcfo_plan')||'starter';
-document.getElementById('planBadge').textContent=plan.charAt(0).toUpperCase()+plan.slice(1);
-document.getElementById('avatarEl').textContent=biz.charAt(0).toUpperCase();
+if(biz){ document.getElementById('planBadge').textContent=plan.charAt(0).toUpperCase()+plan.slice(1); document.getElementById('avatarEl').textContent=biz.charAt(0).toUpperCase(); }
 document.getElementById('bizNameInput').value=biz;
 const planPrices={starter:'Starter Plan — $49/month',pro:'Pro Plan — $99/month',scale:'Scale Plan — $199/month'};
 document.getElementById('currentPlanName').textContent=planPrices[plan]||planPrices.starter;
@@ -676,12 +675,23 @@ document.getElementById('currentPlanName').textContent=planPrices[plan]||planPri
 // Load real profile data
 async function loadProfile(){
   try{
-    const res=await fetch(`${API}/api/profile`,{headers:{'Authorization':'Bearer '+token}});
-    if(!res.ok) return;
-    const p=await res.json();
-    if(p.business_name) document.getElementById('bizNameInput').value=p.business_name;
+    const [profRes, userRes] = await Promise.all([
+      fetch(`${API}/api/profile`,{headers:{'Authorization':'Bearer '+token}}),
+      fetch(`${API}/api/auth/user`,{headers:{'Authorization':'Bearer '+token}}).catch(()=>null)
+    ]);
+    if(!profRes.ok) return;
+    const p=await profRes.json();
+
+    // Business name + avatar
+    if(p.business_name){
+      document.getElementById('bizNameInput').value=p.business_name;
+      document.getElementById('avatarEl').textContent=p.business_name.charAt(0).toUpperCase();
+      localStorage.setItem('lcfo_business',p.business_name);
+    }
     if(p.industry) document.getElementById('industrySelect').value=p.industry;
-    if(p.owner_name) document.getElementById('ownerNameInput') && (document.getElementById('ownerNameInput').value=p.owner_name);
+    if(p.monthly_revenue) document.getElementById('revenueGoal').value='$'+parseInt(p.monthly_revenue).toLocaleString();
+
+    // Plan
     if(p.plan){
       document.getElementById('planBadge').textContent=p.plan.charAt(0).toUpperCase()+p.plan.slice(1);
       document.getElementById('currentPlanName').textContent=planPrices[p.plan]||planPrices.starter;
@@ -692,7 +702,14 @@ async function loadProfile(){
         subEl.textContent=features[p.plan]||'';
       }
     }
-    if(p.monthly_revenue) document.getElementById('revenueGoal').value='$'+parseInt(p.monthly_revenue).toLocaleString();
+
+    // Real email from Supabase auth
+    const emailInput=document.getElementById('emailInput');
+    if(emailInput){
+      // Get email from the login data stored at login time
+      const storedEmail=localStorage.getItem('lcfo_email');
+      if(storedEmail) emailInput.value=storedEmail;
+    }
   }catch(e){console.log('Profile load error',e);}
 }
 loadProfile();

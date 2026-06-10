@@ -224,6 +224,7 @@ async function handleSignup(){
     if(!loginRes.ok)throw new Error('Account created — please sign in.');
     localStorage.setItem('lcfo_token',loginData.session.access_token);
     localStorage.setItem('lcfo_user_id',loginData.user.id);
+    localStorage.setItem('lcfo_email',loginData.user.email);
     localStorage.setItem('lcfo_business',name.value.trim());
     window.location.href='onboarding.html';
   }catch(err){
