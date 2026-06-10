@@ -547,16 +547,18 @@ const API='https://ledger-cfo-backend-production.up.railway.app';
 const token=localStorage.getItem('lcfo_token');
 if(!token){window.location.href='login.html';}
 
-// If returning from Stripe checkout, sync plan from Stripe then reload
+// Always sync plan from Stripe on load to keep it accurate
+fetch(`${API}/api/stripe/sync`, {
+  method:'POST',
+  headers:{'Authorization':'Bearer '+token}
+}).then(r=>r.json()).then(d=>{
+  if(d.plan) localStorage.setItem('lcfo_plan', d.plan);
+}).catch(()=>{});
+
+// If returning from Stripe checkout, show success toast
 if(new URLSearchParams(window.location.search).get('upgraded')==='true'){
   window.history.replaceState({},'',window.location.pathname);
-  fetch(`${API}/api/stripe/sync`, {
-    method:'POST',
-    headers:{'Authorization':'Bearer '+token}
-  }).then(r=>r.json()).then(d=>{
-    if(d.plan) localStorage.setItem('lcfo_plan', d.plan);
-    setTimeout(()=>showToast && showToast('🎉 Subscription activated! Welcome to your '+d.plan+' plan.'), 800);
-  }).catch(()=>{});
+  setTimeout(()=>showToast && showToast('🎉 Subscription activated! Welcome to your new plan.'), 1200);
 }
 
 
@@ -680,8 +682,8 @@ async function loadDashboard(){
     if(fin && (fin.cash_balance||fin.outstanding_invoices||fin.expenses?.length)){
       populateFinancials(fin, revenue);
     } else {
-      // Show setup card
-      if(plan!=='starter') document.getElementById('setupCard').style.display='flex';
+      // Show setup card for all plans — everyone can add numbers
+      document.getElementById('setupCard').style.display='flex';
     }
 
   }catch(e){
