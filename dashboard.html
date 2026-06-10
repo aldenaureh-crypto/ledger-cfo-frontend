@@ -678,7 +678,6 @@ async function loadDashboard(){
     }
 
     // Load financial data if available
-    const fin=profile.finances_manual;
     if(fin && (fin.cash_balance||fin.outstanding_invoices||fin.expenses?.length)){
       populateFinancials(fin, revenue);
     } else {
