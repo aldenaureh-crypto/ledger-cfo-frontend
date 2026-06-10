@@ -121,7 +121,7 @@
 
       <!-- STEP 1: Business name -->
       <div class="step active" id="step1">
-        <p class="step-label">Step 1 of 5</p>
+        <p class="step-label">Step 1 of 7</p>
         <h2 class="step-title">What's your business called?</h2>
         <p class="step-sub">This is how your AI CFO will refer to your business in every conversation and report.</p>
         <div class="form-group">
@@ -136,7 +136,7 @@
 
       <!-- STEP 2: Industry -->
       <div class="step" id="step2">
-        <p class="step-label">Step 2 of 5</p>
+        <p class="step-label">Step 2 of 7</p>
         <h2 class="step-title">What industry are you in?</h2>
         <p class="step-sub">Your AI CFO gives more relevant advice when it understands your business type.</p>
         <div class="options-grid">
@@ -184,7 +184,7 @@
 
       <!-- STEP 3: Revenue -->
       <div class="step" id="step3">
-        <p class="step-label">Step 3 of 5</p>
+        <p class="step-label">Step 3 of 7</p>
         <h2 class="step-title">What's your monthly revenue?</h2>
         <p class="step-sub">An estimate is fine. This helps your CFO calibrate advice to your actual scale.</p>
         <div class="slider-wrap">
@@ -199,7 +199,7 @@
 
       <!-- STEP 4: Employees -->
       <div class="step" id="step4">
-        <p class="step-label">Step 4 of 5</p>
+        <p class="step-label">Step 4 of 7</p>
         <h2 class="step-title">How many people work for you?</h2>
         <p class="step-sub">Including contractors, part-time staff, and yourself.</p>
         <div class="options-grid">
@@ -218,10 +218,47 @@
         </div>
       </div>
 
-      <!-- STEP 5: Goal -->
+      <!-- STEP 5: Years in business -->
       <div class="step" id="step5">
-        <p class="step-label">Step 5 of 5</p>
-        <h2 class="step-title">What's your biggest financial challenge?</h2>
+        <p class="step-label">Step 5 of 7</p>
+        <h2 class="step-title">How long have you been in business?</h2>
+        <p class="step-sub">This helps your CFO give advice that fits where you actually are — not where a Fortune 500 is.</p>
+        <div class="options-grid">
+          <div class="option-card" onclick="selectOption(this,'years_in_business','less-than-1')">
+            <span class="icon">🌱</span><span class="label">Less than 1 year</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'years_in_business','1-3')">
+            <span class="icon">🪴</span><span class="label">1–3 years</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'years_in_business','3-7')">
+            <span class="icon">🌳</span><span class="label">3–7 years</span>
+          </div>
+          <div class="option-card" onclick="selectOption(this,'years_in_business','7-plus')">
+            <span class="icon">🏆</span><span class="label">7+ years</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6: Revenue goal -->
+      <div class="step" id="step6">
+        <p class="step-label">Step 6 of 7</p>
+        <h2 class="step-title">What's your revenue target for the next 12 months?</h2>
+        <p class="step-sub">Your CFO will track your gap to this number and keep every recommendation pointed toward it.</p>
+        <div class="slider-wrap">
+          <div class="slider-value" id="goalDisplay">$50,000</div>
+          <div class="slider-label">monthly revenue goal</div>
+          <div style="margin:16px 0">
+            <div class="slider-labels"><span>$5k</span><span>$100k</span><span>$500k+</span></div>
+            <input type="range" id="goalSlider" min="5000" max="500000" step="5000" value="50000" oninput="updateGoal(this.value)"/>
+          </div>
+          <div id="goalGapNote" style="font-size:13px;color:var(--gray);font-weight:300;margin-top:8px;min-height:20px"></div>
+        </div>
+      </div>
+
+      <!-- STEP 7: Goal -->
+      <div class="step" id="step7">
+        <p class="step-label">Step 7 of 7</p>
+        <h2 class="step-title">What's your biggest financial challenge right now?</h2>
         <p class="step-sub">Your CFO will prioritize this in every conversation and proactively watch for it.</p>
         <div style="display:flex;flex-direction:column;gap:10px">
           <div class="option-card" style="grid-column:span 2" onclick="selectOption(this,'goal','cashflow')">
@@ -249,7 +286,7 @@
 
     <div class="card-footer">
       <button class="btn-back" id="backBtn" onclick="goBack()" style="visibility:hidden">← Back</button>
-      <span class="step-counter" id="stepCounter">1 of 5</span>
+      <span class="step-counter" id="stepCounter">1 of 7</span>
       <button class="btn-next" id="nextBtn" onclick="goNext()" disabled>Continue →</button>
     </div>
   </div>
@@ -257,8 +294,8 @@
 
 <script>
 let currentStep = 1;
-const totalSteps = 5;
-const selections = { industry: null, employees: null, goal: null };
+const totalSteps = 7;
+const selections = { industry: null, employees: null, years_in_business: null, goal: null };
 
 function checkStep1() {
   const name = document.getElementById('bizName').value.trim();
@@ -286,6 +323,24 @@ function updateRevenue(val) {
   document.getElementById('nextBtn').disabled = false;
 }
 
+function updateGoal(val) {
+  const num = parseInt(val);
+  const display = num >= 500000 ? '$500,000+' : '$' + num.toLocaleString();
+  document.getElementById('goalDisplay').textContent = display;
+  document.getElementById('nextBtn').disabled = false;
+  const current = parseInt(document.getElementById('revenueSlider').value) || 0;
+  const note = document.getElementById('goalGapNote');
+  if(current > 0 && num > current){
+    const gap = num - current;
+    const pct = Math.round((gap / current) * 100);
+    note.textContent = `That's $${gap.toLocaleString()}/mo more than today — ${pct}% growth.`;
+  } else if(num <= current) {
+    note.textContent = 'Tip: set a goal above your current revenue to track growth.';
+  } else {
+    note.textContent = '';
+  }
+}
+
 function goNext() {
   if (currentStep === totalSteps) {
     saveAndContinue();
@@ -310,15 +365,16 @@ function updateUI() {
   document.getElementById('progressFill').style.width = pct + '%';
   document.getElementById('stepCounter').textContent = `${currentStep} of ${totalSteps}`;
   document.getElementById('backBtn').style.visibility = currentStep > 1 ? 'visible' : 'hidden';
-  document.getElementById('nextBtn').textContent = currentStep === totalSteps ? 'Go to my dashboard →' : 'Continue →';
+  document.getElementById('nextBtn').textContent = currentStep === totalSteps ? 'Go to my plan →' : 'Continue →';
 
   // Reset next button state per step
   if (currentStep === 1) {
     checkStep1();
-  } else if (currentStep === 3) {
-    document.getElementById('nextBtn').disabled = false;
+  } else if (currentStep === 3 || currentStep === 6) {
+    document.getElementById('nextBtn').disabled = false; // sliders are always valid
   } else {
-    document.getElementById('nextBtn').disabled = !selections[['','industry','','employees','goal'][currentStep]];
+    const stepField = ['','industry','','employees','years_in_business','','goal'][currentStep];
+    document.getElementById('nextBtn').disabled = stepField ? !selections[stepField] : false;
   }
 }
 
@@ -329,6 +385,7 @@ async function saveAndContinue() {
   const bizName = document.getElementById('bizName').value.trim();
   const ownerName = document.getElementById('ownerName').value.trim();
   const revenue = document.getElementById('revenueSlider').value;
+  const revenueGoal = document.getElementById('goalSlider').value;
 
   localStorage.setItem('lcfo_business', bizName);
   localStorage.setItem('lcfo_owner', ownerName);
@@ -336,6 +393,8 @@ async function saveAndContinue() {
   localStorage.setItem('lcfo_industry', selections.industry);
   localStorage.setItem('lcfo_employees', selections.employees);
   localStorage.setItem('lcfo_goal', selections.goal);
+  localStorage.setItem('lcfo_revenue_goal', revenueGoal);
+  localStorage.setItem('lcfo_years_in_business', selections.years_in_business);
 
   // Save to Supabase if logged in
   const token = localStorage.getItem('lcfo_token');
@@ -350,7 +409,9 @@ async function saveAndContinue() {
           monthly_revenue:parseInt(revenue),
           industry:selections.industry,
           employees:selections.employees,
-          goal:selections.goal
+          goal:selections.goal,
+          revenue_goal:parseInt(revenueGoal),
+          years_in_business:selections.years_in_business
         })
       });
     }catch(e){console.log('Profile save error',e);}

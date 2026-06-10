@@ -412,10 +412,6 @@
           <div class="alert-icon"><i class="ti ti-message" aria-hidden="true"></i></div>
           <div class="alert-text"><strong>Your CFO is ready.</strong> Ask a question below to get financial advice personalized to your business.</div>
         </div>
-        <div class="alert-item info" id="goalAlert" style="display:none">
-          <div class="alert-icon"><i class="ti ti-target" aria-hidden="true"></i></div>
-          <div class="alert-text" id="goalAlertText"></div>
-        </div>
       </div>
     </div>
   </div>
@@ -660,22 +656,8 @@ async function loadDashboard(){
       if(revSub) revSub.textContent='Monthly · from your profile';
     }
 
-    // Show goal-based insight
-    const goalMessages={
-      cashflow:'Your top priority is cash flow. Ask your CFO to walk you through a cash flow audit for your business.',
-      growth:'Your goal is revenue growth. Ask your CFO what the highest-leverage moves are to hit your next milestone.',
-      expenses:'Your focus is cutting costs. Ask your CFO to identify where businesses like yours typically overspend.',
-      hiring:'You\'re thinking about hiring. Ask your CFO how to know when you can actually afford your next team member.',
-    };
-    const goalMsg=goalMessages[profile.goal];
-    if(goalMsg){
-      const goalAlert=document.getElementById('goalAlert');
-      const goalAlertText=document.getElementById('goalAlertText');
-      if(goalAlert && goalAlertText){
-        goalAlertText.innerHTML='<strong>Based on your goal.</strong> '+goalMsg;
-        goalAlert.style.display='flex';
-      }
-    }
+    // Build smart personalized insights
+    buildInsights(profile, revenue);
 
     // Load financial data if available
     if(fin && (fin.cash_balance||fin.outstanding_invoices||fin.expenses?.length)){
@@ -755,6 +737,66 @@ function populateFinancials(fin, revenue){
       html+=`</div><p style="font-size:12px;color:var(--gray-light);margin-top:16px;font-weight:300"><button onclick="openSetupModal('manual')" style="background:none;border:none;color:var(--navy);cursor:pointer;font-size:12px;font-family:'Epilogue',sans-serif;font-weight:500;padding:0">Edit numbers</button></p>`;
       container.innerHTML=html;
     }
+  }
+}
+
+// ── SMART INSIGHTS ────────────────────────────────────────────────────────────
+function buildInsights(profile, revenue){
+  const list = document.getElementById('alertsList');
+  const tag = document.getElementById('alertsTag');
+  const items = [];
+
+  // Revenue goal progress
+  if(profile.revenue_goal && revenue > 0){
+    const goal = profile.revenue_goal;
+    const gap = goal - revenue;
+    const pct = Math.round((revenue / goal) * 100);
+    if(gap > 0){
+      items.push({type:'info', icon:'🎯', text:`<strong>Goal tracker.</strong> You're at $${revenue.toLocaleString()}/mo — $${gap.toLocaleString()}/mo away from your $${goal.toLocaleString()} target. That's ${pct}% of the way there.`});
+    } else {
+      items.push({type:'success', icon:'🎯', text:`<strong>Goal hit.</strong> You're at $${revenue.toLocaleString()}/mo — you've hit your $${goal.toLocaleString()} target. Time to set a new one.`});
+    }
+  }
+
+  // Industry benchmarks
+  const benchmarks = {
+    restaurant: {type:'warning', icon:'🍽️', text:`<strong>Restaurant benchmark.</strong> Food cost should run 28–32% of revenue ($${Math.round(revenue*0.3).toLocaleString()}/mo at your scale). Labor typically adds another 30–35%. Ask your CFO if you're in range.`},
+    landscaping: {type:'info', icon:'🌿', text:`<strong>Landscaping insight.</strong> Route density is your biggest profit lever — adding a stop to an existing route costs almost nothing. Ask your CFO how to price recurring maintenance vs. one-time jobs.`},
+    construction: {type:'warning', icon:'🔨', text:`<strong>Construction benchmark.</strong> Healthy job margins run 15–25% after labor and materials. If you're quoting jobs without a written estimate, you're likely leaving 10–15% on the table.`},
+    healthcare: {type:'info', icon:'🏥', text:`<strong>Healthcare benchmark.</strong> Revenue per visit and patient no-show rate are your two biggest financial levers. A 10% drop in no-shows can add thousands monthly without a single new patient.`},
+    legal: {type:'info', icon:'⚖️', text:`<strong>Law firm benchmark.</strong> Billable hour realization rate (what you bill vs. what you collect) should be above 85%. Below that, ask your CFO how to tighten your collections process.`},
+    tech: {type:'info', icon:'💻', text:`<strong>SaaS benchmark.</strong> Healthy MRR growth for early-stage SaaS is 10–20% month-over-month. Your LTV:CAC ratio should be at least 3:1. Ask your CFO to run these numbers.`},
+    ecommerce: {type:'warning', icon:'🛒', text:`<strong>E-commerce benchmark.</strong> Blended ROAS above 3x is healthy for most categories. If your AOV (average order value) is under $75, upsells and bundles are your highest-leverage move.`},
+    realestate: {type:'info', icon:'🏠', text:`<strong>Real estate benchmark.</strong> GCI per transaction and transaction volume are your two core metrics. Ask your CFO how your split structure affects your effective hourly rate.`},
+    fitness: {type:'info', icon:'💪', text:`<strong>Fitness benchmark.</strong> Member LTV divided by CAC should be above 3. Monthly churn above 5% is a retention problem — ask your CFO what levers to pull first.`},
+    marketing: {type:'info', icon:'📱', text:`<strong>Agency benchmark.</strong> Retainer MRR is more valuable than project revenue — it's more predictable and commands a premium. Your utilization rate (billable hrs / total hrs) should be above 65%.`},
+  };
+  const bench = benchmarks[profile.industry];
+  if(bench) items.push(bench);
+
+  // Goal-specific advice
+  const goalMessages = {
+    cashflow: {type:'warning', icon:'💸', text:`<strong>Cash flow focus.</strong> The #1 cash killer for small businesses is slow-paying clients combined with fast-paying expenses. Ask your CFO to map your cash gap — when money goes out vs. when it comes in.`},
+    growth:   {type:'info',    icon:'📈', text:`<strong>Growth focus.</strong> Before spending on marketing, identify your highest-margin product or service. Doubling down on what's already working is almost always faster than finding new revenue.`},
+    expenses: {type:'warning', icon:'✂️', text:`<strong>Cost focus.</strong> Most small businesses have 2–3 subscriptions or vendor contracts they've outgrown. Ask your CFO to do a line-by-line expense audit — it takes 10 minutes and usually finds $500–$2,000/mo.`},
+    hiring:   {type:'info',    icon:'👥', text:`<strong>Hiring readiness.</strong> The rule of thumb: you can afford a hire when you have 3 months of their salary in cash and a clear plan for how they generate more revenue than they cost within 6 months.`},
+  };
+  const goalMsg = goalMessages[profile.goal];
+  if(goalMsg) items.push(goalMsg);
+
+  // Years in business — early stage warning
+  if(profile.years_in_business === 'less-than-1'){
+    items.push({type:'warning', icon:'🌱', text:`<strong>Early stage.</strong> In your first year, cash flow will hit zero before you expect it. Your CFO's top job right now is making sure you never run out of runway. Add your numbers to get a real cash runway estimate.`});
+  }
+
+  // Replace alerts list
+  if(items.length > 0){
+    if(tag) tag.textContent = 'Personalized for you';
+    list.innerHTML = items.slice(0,3).map(i=>`
+      <div class="alert-item ${i.type}">
+        <div class="alert-icon">${i.icon}</div>
+        <div class="alert-text">${i.text}</div>
+      </div>`).join('');
   }
 }
 
