@@ -159,6 +159,13 @@
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
       7-day free trial included — no credit card needed
     </div>
+
+    <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);text-align:center">
+      <p style="font-size:12px;color:var(--gray-light);margin-bottom:10px;font-weight:300">Just want to explore first?</p>
+      <button onclick="demoLogin()" id="demoBtn" style="width:100%;font-family:'Epilogue',sans-serif;font-size:14px;font-weight:500;padding:12px;background:var(--cream);color:var(--navy);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.2s">
+        Try the live demo — no signup needed →
+      </button>
+    </div>
   </div>
 </div>
 
@@ -236,6 +243,24 @@ async function handleSignup(){
 
 // Allow enter key
 document.addEventListener('keydown',e=>{if(e.key==='Enter')handleSignup();});
+
+async function demoLogin(){
+  const btn=document.getElementById('demoBtn');
+  btn.textContent='Loading demo...';btn.disabled=true;
+  try{
+    const res=await fetch(`${API}/api/auth/demo`,{method:'POST'});
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||'Demo unavailable');
+    localStorage.setItem('lcfo_token',data.session.access_token);
+    localStorage.setItem('lcfo_user_id',data.user.id);
+    localStorage.setItem('lcfo_email',data.user.email);
+    localStorage.setItem('lcfo_business',data.business_name);
+    window.location.href='dashboard.html';
+  }catch(err){
+    btn.textContent='Try the live demo — no signup needed →';btn.disabled=false;
+    alert('Demo unavailable right now. Please try again.');
+  }
+}
 </script>
 </body>
 </html>
