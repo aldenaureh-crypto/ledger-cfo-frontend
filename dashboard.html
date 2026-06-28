@@ -140,6 +140,44 @@
     .setup-btn-secondary{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:500;padding:10px 22px;background:rgba(255,255,255,0.12);color:white;border:1px solid rgba(255,255,255,0.25);border-radius:8px;cursor:pointer;transition:background 0.2s;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center}
     .setup-btn-secondary:hover{background:rgba(255,255,255,0.2)}
 
+    /* COMPLETION TRACKER */
+    .completion-track{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:24px 28px;margin-bottom:20px}
+    .completion-track-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+    .completion-track-title{font-size:14px;font-weight:500;color:var(--charcoal)}
+    .completion-track-pct{font-size:13px;font-weight:600;color:var(--navy)}
+    .completion-progress{height:6px;background:var(--border);border-radius:3px;margin-bottom:20px;overflow:hidden}
+    .completion-progress-fill{height:100%;background:var(--navy);border-radius:3px;transition:width 0.6s ease}
+    .completion-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+    .completion-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--cream);cursor:pointer;transition:border-color 0.2s}
+    .completion-item:hover{border-color:var(--navy)}
+    .completion-item.done{background:var(--green-pale);border-color:rgba(26,110,74,0.2);cursor:default}
+    .completion-item-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+    .completion-item.done .completion-item-icon{background:rgba(26,110,74,0.15)}
+    .completion-item:not(.done) .completion-item-icon{background:var(--border)}
+    .completion-item-text{font-size:12px;font-weight:400;color:var(--charcoal);line-height:1.4}
+    .completion-item-unlock{font-size:11px;color:var(--gray-light);font-weight:300;margin-top:1px}
+    .completion-item.done .completion-item-unlock{color:var(--green)}
+
+    /* KEY INSIGHTS STRIP */
+    .insights-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+    .insight-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;transition:box-shadow 0.2s}
+    .insight-card:hover{box-shadow:var(--shadow-md)}
+    .insight-card.locked{cursor:pointer}
+    .insight-card.locked:hover{border-color:var(--navy)}
+    .insight-icon{font-size:20px;margin-bottom:10px;display:block}
+    .insight-label{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray-light);margin-bottom:6px}
+    .insight-value{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--charcoal);line-height:1;margin-bottom:4px}
+    .insight-value.good{color:var(--green)}
+    .insight-value.warn{color:var(--amber)}
+    .insight-value.bad{color:var(--red)}
+    .insight-sub{font-size:12px;color:var(--gray);font-weight:300;line-height:1.4}
+    .insight-locked-overlay{position:absolute;inset:0;background:rgba(246,248,252,0.7);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-radius:14px}
+    .insight-locked-overlay span{font-size:11px;font-weight:500;color:var(--navy);text-align:center;padding:0 12px;line-height:1.4}
+    .insight-locked-overlay .lock-icon{font-size:16px}
+
+    @media(max-width:900px){.insights-strip{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:500px){.insights-strip{grid-template-columns:1fr 1fr}}
+
     /* SETUP MODAL */
     .modal-overlay{position:fixed;inset:0;background:rgba(13,17,23,0.5);z-index:300;display:none;align-items:center;justify-content:center;padding:24px}
     .modal-overlay.show{display:flex}
@@ -365,6 +403,65 @@
     <button class="btn-primary" onclick="openSetupModal()">Add your numbers</button>
   </div>
 
+  <!-- COMPLETION TRACKER — shown when data is incomplete -->
+  <div class="completion-track fade3" id="completionTrack" style="display:none">
+    <div class="completion-track-top">
+      <span class="completion-track-title">Your dashboard is incomplete — here's what's missing</span>
+      <span class="completion-track-pct" id="completionPct">0% complete</span>
+    </div>
+    <div class="completion-progress"><div class="completion-progress-fill" id="completionFill" style="width:0%"></div></div>
+    <div class="completion-items">
+      <div class="completion-item done" id="ci-revenue">
+        <div class="completion-item-icon">✓</div>
+        <div><div class="completion-item-text">Monthly revenue</div><div class="completion-item-unlock">✓ Added from your profile</div></div>
+      </div>
+      <div class="completion-item" id="ci-expenses" onclick="openSetupModal('manual')">
+        <div class="completion-item-icon">🧾</div>
+        <div><div class="completion-item-text">Monthly expenses</div><div class="completion-item-unlock">Unlocks: net profit, margin %, top cost analysis</div></div>
+      </div>
+      <div class="completion-item" id="ci-cash" onclick="openSetupModal('manual')">
+        <div class="completion-item-icon">🏦</div>
+        <div><div class="completion-item-text">Cash balance</div><div class="completion-item-unlock">Unlocks: cash runway, liquidity alerts</div></div>
+      </div>
+      <div class="completion-item" id="ci-invoices" onclick="openSetupModal('manual')">
+        <div class="completion-item-icon">📬</div>
+        <div><div class="completion-item-text">Outstanding invoices</div><div class="completion-item-unlock">Unlocks: collections analysis, cash gap</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KEY INSIGHTS STRIP -->
+  <div class="insights-strip fade3" id="insightsStrip">
+    <div class="insight-card locked" id="ins-runway" onclick="openSetupModal('manual')">
+      <span class="insight-icon">💰</span>
+      <div class="insight-label">Cash runway</div>
+      <div class="insight-value" id="ins-runway-val">—</div>
+      <div class="insight-sub" id="ins-runway-sub">months remaining</div>
+      <div class="insight-locked-overlay" id="ins-runway-lock"><span class="lock-icon">🔒</span><span>Add cash balance + expenses to unlock</span></div>
+    </div>
+    <div class="insight-card locked" id="ins-margin" onclick="openSetupModal('manual')">
+      <span class="insight-icon">📊</span>
+      <div class="insight-label">Net margin</div>
+      <div class="insight-value" id="ins-margin-val">—</div>
+      <div class="insight-sub" id="ins-margin-sub">of revenue kept as profit</div>
+      <div class="insight-locked-overlay" id="ins-margin-lock"><span class="lock-icon">🔒</span><span>Add expenses to unlock</span></div>
+    </div>
+    <div class="insight-card locked" id="ins-topcost" onclick="openSetupModal('manual')">
+      <span class="insight-icon">🧾</span>
+      <div class="insight-label">Biggest cost</div>
+      <div class="insight-value" id="ins-topcost-val" style="font-size:18px">—</div>
+      <div class="insight-sub" id="ins-topcost-sub">of monthly revenue</div>
+      <div class="insight-locked-overlay" id="ins-topcost-lock"><span class="lock-icon">🔒</span><span>Add expenses to unlock</span></div>
+    </div>
+    <div class="insight-card locked" id="ins-goal" onclick="openSetupModal('manual')">
+      <span class="insight-icon">🎯</span>
+      <div class="insight-label">Goal gap</div>
+      <div class="insight-value" id="ins-goal-val">—</div>
+      <div class="insight-sub" id="ins-goal-sub">away from your target</div>
+      <div class="insight-locked-overlay" id="ins-goal-lock"><span class="lock-icon">🔒</span><span>Set a revenue goal in onboarding to unlock</span></div>
+    </div>
+  </div>
+
   <!-- STATS -->
   <div class="stats-grid fade3">
     <div class="stat-card">
@@ -372,20 +469,20 @@
       <div class="stat-value" id="stat-revenue">—</div>
       <div class="stat-change neutral" id="stat-revenue-sub">From your profile</div>
     </div>
-    <div class="stat-card" style="position:relative">
+    <div class="stat-card">
       <div class="stat-label"><i class="ti ti-trending-up" style="font-size:14px" aria-hidden="true"></i> Net profit</div>
       <div class="stat-value" id="stat-profit" style="font-size:22px;color:var(--gray-light);font-family:'Epilogue',sans-serif;font-weight:300">Add numbers</div>
-      <div class="stat-change neutral">Enter your expenses below</div>
+      <div class="stat-change neutral" id="stat-profit-sub">Enter your expenses below</div>
     </div>
     <div class="stat-card">
       <div class="stat-label"><i class="ti ti-wallet" style="font-size:14px" aria-hidden="true"></i> Cash balance</div>
       <div class="stat-value" id="stat-cash" style="font-size:22px;color:var(--gray-light);font-family:'Epilogue',sans-serif;font-weight:300">Add numbers</div>
-      <div class="stat-change neutral">Enter your balance below</div>
+      <div class="stat-change neutral" id="stat-cash-sub">Enter your balance below</div>
     </div>
     <div class="stat-card">
       <div class="stat-label"><i class="ti ti-receipt" style="font-size:14px" aria-hidden="true"></i> Outstanding invoices</div>
       <div class="stat-value" id="stat-invoices" style="font-size:22px;color:var(--gray-light);font-family:'Epilogue',sans-serif;font-weight:300">Add numbers</div>
-      <div class="stat-change neutral">Enter what you're owed</div>
+      <div class="stat-change neutral" id="stat-invoices-sub">Enter what you're owed</div>
     </div>
   </div>
 
@@ -659,11 +756,15 @@ async function loadDashboard(){
     // Build smart personalized insights
     buildInsights(profile, revenue);
 
+    // Always update completion tracker + insight strip
+    updateCompletionTracker(fin, revenue, profile);
+    updateInsightStrip(fin, revenue, profile);
+
     // Load financial data if available
     if(fin && (fin.cash_balance||fin.outstanding_invoices||fin.expenses?.length)){
       populateFinancials(fin, revenue);
+      document.getElementById('setupCard').style.display='none';
     } else {
-      // Show setup card for all plans — everyone can add numbers
       document.getElementById('setupCard').style.display='flex';
     }
 
@@ -673,6 +774,107 @@ async function loadDashboard(){
 }
 
 function fmt(n){return '$'+Math.round(n).toLocaleString();}
+
+function updateCompletionTracker(fin, revenue, profile){
+  const hasRevenue = revenue > 0;
+  const hasExpenses = fin && fin.expenses && fin.expenses.length > 0;
+  const hasCash = fin && fin.cash_balance > 0;
+  const hasInvoices = fin && fin.outstanding_invoices > 0;
+  const allDone = hasExpenses && hasCash && hasInvoices;
+
+  // Hide tracker once everything is filled in
+  const track = document.getElementById('completionTrack');
+  if(allDone){ track.style.display='none'; return; }
+  track.style.display='block';
+
+  const count = [hasRevenue, hasExpenses, hasCash, hasInvoices].filter(Boolean).length;
+  const pct = Math.round((count / 4) * 100);
+  document.getElementById('completionPct').textContent = pct + '% complete';
+  document.getElementById('completionFill').style.width = pct + '%';
+
+  const mark = (id, done) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(done){
+      el.classList.add('done');
+      el.onclick = null;
+      el.querySelector('.completion-item-icon').textContent = '✓';
+      const unlock = el.querySelector('.completion-item-unlock');
+      if(unlock) unlock.textContent = '✓ Added';
+    }
+  };
+  mark('ci-revenue', hasRevenue);
+  mark('ci-expenses', hasExpenses);
+  mark('ci-cash', hasCash);
+  mark('ci-invoices', hasInvoices);
+}
+
+function updateInsightStrip(fin, revenue, profile){
+  // ── Cash runway ──
+  if(fin && fin.cash_balance > 0 && fin.total_expenses > 0){
+    const runway = fin.cash_balance / fin.total_expenses;
+    const runwayStr = runway >= 1 ? runway.toFixed(1) : Math.round(runway * 30) + ' days';
+    const runwayUnit = runway >= 1 ? 'months of runway' : 'days of runway';
+    const runwayClass = runway >= 6 ? 'good' : runway >= 3 ? 'warn' : 'bad';
+    const runwaySub = runway < 2
+      ? '⚠️ Under 2 months — build your cash reserve'
+      : runway < 4
+      ? 'Getting lean — watch your spending'
+      : 'Healthy cushion';
+    document.getElementById('ins-runway-val').textContent = runway >= 1 ? runway.toFixed(1) : Math.round(runway*30)+'d';
+    document.getElementById('ins-runway-val').className = 'insight-value ' + runwayClass;
+    document.getElementById('ins-runway-sub').textContent = runwaySub;
+    document.getElementById('ins-runway-lock').style.display = 'none';
+    document.getElementById('ins-runway').classList.remove('locked');
+    document.getElementById('ins-runway').onclick = null;
+  }
+
+  // ── Net margin ──
+  if(fin && fin.total_expenses > 0 && revenue > 0){
+    const margin = Math.round(((revenue - fin.total_expenses) / revenue) * 100);
+    const marginClass = margin >= 20 ? 'good' : margin >= 10 ? 'warn' : 'bad';
+    const marginSub = margin >= 20 ? 'Strong margin — well run' : margin >= 10 ? 'Thin — room to improve' : '⚠️ Low — expenses eating revenue';
+    document.getElementById('ins-margin-val').textContent = margin + '%';
+    document.getElementById('ins-margin-val').className = 'insight-value ' + marginClass;
+    document.getElementById('ins-margin-sub').textContent = marginSub;
+    document.getElementById('ins-margin-lock').style.display = 'none';
+    document.getElementById('ins-margin').classList.remove('locked');
+    document.getElementById('ins-margin').onclick = null;
+  }
+
+  // ── Biggest cost ──
+  if(fin && fin.expenses && fin.expenses.length > 0 && revenue > 0){
+    const top = fin.expenses.filter(e=>e.amount>0).sort((a,b)=>b.amount-a.amount)[0];
+    if(top){
+      const topPct = Math.round((top.amount / revenue) * 100);
+      document.getElementById('ins-topcost-val').textContent = top.name;
+      document.getElementById('ins-topcost-val').className = 'insight-value';
+      document.getElementById('ins-topcost-sub').textContent = fmt(top.amount) + '/mo · ' + topPct + '% of revenue';
+      document.getElementById('ins-topcost-lock').style.display = 'none';
+      document.getElementById('ins-topcost').classList.remove('locked');
+      document.getElementById('ins-topcost').onclick = null;
+    }
+  }
+
+  // ── Goal gap ──
+  if(profile.revenue_goal && revenue > 0){
+    const gap = profile.revenue_goal - revenue;
+    const goalEl = document.getElementById('ins-goal');
+    if(gap > 0){
+      const monthsToGoal = revenue > 0 ? '~' + Math.ceil(gap / (revenue * 0.1)) + ' mo at 10% growth' : '';
+      document.getElementById('ins-goal-val').textContent = fmt(gap);
+      document.getElementById('ins-goal-val').className = 'insight-value warn';
+      document.getElementById('ins-goal-sub').textContent = 'to hit $' + profile.revenue_goal.toLocaleString() + '/mo · ' + monthsToGoal;
+    } else {
+      document.getElementById('ins-goal-val').textContent = '🎉 Hit';
+      document.getElementById('ins-goal-val').className = 'insight-value good';
+      document.getElementById('ins-goal-sub').textContent = 'Your $' + profile.revenue_goal.toLocaleString() + ' goal is reached';
+    }
+    document.getElementById('ins-goal-lock').style.display = 'none';
+    goalEl.classList.remove('locked');
+    goalEl.onclick = null;
+  }
+}
 
 function populateFinancials(fin, revenue){
   // Hide setup card
